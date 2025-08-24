@@ -1,260 +1,250 @@
-// Grrow Quiz – React component for Next.js (App Router)
-// Save this as: app/quiz/GrrowQuiz.tsx
+// app/quiz/page.tsx (Next.js 13+/App Router)
+// - Server component fetches questions directly from Airtable (read-only)
+// - Passes normalised data to a small client Quiz component
+// - Tailwind CSS styling; brand fonts/colors inline
 
-import React, { useMemo, useState, useEffect } from "react";
+'use client';
 
-const BRAND = {
-  purple: "#5F259F",
-  green: "#3AAA89",
+// NOTE: Because canvas renders a single file, this exports a client component that
+// performs the fetch on the server via an API route-like call using NEXT_PUBLIC envs
+// or (preferably) you can move fetch logic to a dedicated server route later.
+
+import React, { useMemo, useState } from 'react';
+
+// ────────────────────────────────────────────────────────────────────────────────
+// Types
+// ────────────────────────────────────────────────────────────────────────────────
+
+type AirtableRecord = {
+  id: string;
+  fields: {
+    ID?: string;
+    Circle?: 'Essentials' | 'Exploring' | 'Supporting' | 'Leading';
+    Skillset?: string; // e.g. Clarify, Simplify, Solve, Innovate, etc.
+    Goal?: string; // objective text
+    Question?: string;
+    Active?: boolean;
+  };
 };
 
-// --- DATA --------------------------------------------------------------
-const CIRCLES = ["Essentials", "Exploring", "Supporting", "Leading"] as const;
-const STRENGTHS = [
-  "Creativity",
-  "Collaboration",
-  "Communication",
-  "Critical Thinking",
-] as const;
-
-type Circle = typeof CIRCLES[number];
-type Strength = typeof STRENGTHS[number];
-
 type Question = {
-  id: string;
-  strength: Strength;
-  circle: Circle;
+  recordId: string; // Airtable record id
+  id: string; // your readable ID (e.g., CT-CLA-01)
+  circle: NonNullable<AirtableRecord['fields']['Circle']>;
   skill: string;
+  goal: string;
   text: string;
 };
 
-// Only a few shown here for brevity – in your real file include all 48
-const QUESTIONS: Question[] = [
-  { id: "ct-essential-clarify-1", strength: "Critical Thinking", circle: "Essentials", skill: "Clarify", text: "Do you take time to clarify any requests, briefs or feedback?" },
-  { id: "ct-essential-clarify-2", strength: "Critical Thinking", circle: "Essentials", skill: "Clarify", text: "Can you recognise key challenges or constraints up front?" },
-  { id: "ct-essential-clarify-3", strength: "Critical Thinking", circle: "Essentials", skill: "Clarify", text: "Do you clearly summarise what and why before you get started?" },
-  // ... add the rest of the 48 from your question list
-];
+// ────────────────────────────────────────────────────────────────────────────────
+// Airtable fetch (client-side for this single-file demo)
+// In production, prefer server-side fetch to keep the token secret.
+// Create a read-only PAT scoped to this base (records:read) and expose it as a
+// NEXT_PUBLIC_* only if you accept the tradeoff (view-only, limited scope).
+// Better: move fetch to a Next.js route handler (app/api/questions/route.ts) and
+// call it from the client. For now we keep it self‑contained.
+// ────────────────────────────────────────────────────────────────────────────────
 
-function groupBy<T extends Record<string, any>>(arr: T[], by: keyof T) {
-  return arr.reduce<Record<string, T[]>>((acc, item) => {
-    const k = String(item[by]);
-    (acc[k] ||= []).push(item);
-    return acc;
-  }, {});
+const AIRTABLE_TOKEN = process.env.NEXT_PUBLIC_AIRTABLE_TOKEN as string;
+const AIRTABLE_BASE = process.env.NEXT_PUBLIC_AIRTABLE_BASE as string; // appXXXXXXXX
+const AIRTABLE_TABLE = process.env.NEXT_PUBLIC_AIRTABLE_TABLE as string; // Questions
+
+if (!AIRTABLE_TOKEN || !AIRTABLE_BASE || !AIRTABLE_TABLE) {
+  // eslint-disable-next-line no-console
+  console.warn('Airtable env vars missing. Set NEXT_PUBLIC_AIRTABLE_* in .env.local');
 }
 
-function average(nums: number[]) {
-  if (!nums.length) return 0;
-  return nums.reduce((a, b) => a + b, 0) / nums.length;
+async function fetchAllQuestions(): Promise<Question[]> {
+  const headers = { Authorization: `Bearer ${AIRTABLE_TOKEN}` } as const;
+  const url = new URL(`https://api.airtable.com/v0/${AIRTABLE_BASE}/${encodeURIComponent(AIRTABLE_TABLE)}`);
+  // If you add an "Active" checkbox, uncomment the filterByFormula below
+  // url.searchParams.set('filterByFormula', "{Active} = 1");
+  url.searchParams.set('sort[0][field]', 'ID');
+  url.searchParams.set('sort[0][direction]', 'asc');
+
+  let offset: string | undefined;
+  const all: AirtableRecord[] = [];
+
+  do {
+    if (offset) url.searchParams.set('offset', offset);
+    const res = await fetch(url.toString(), { headers, cache: 'no-store' });
+    if (!res.ok) throw new Error('Failed to fetch Airtable');
+    const data: { records: AirtableRecord[]; offset?: string } = await res.json();
+    all.push(...data.records);
+    offset = data.offset;
+  } while (offset);
+
+  const circleOrder = ['Essentials', 'Exploring', 'Supporting', 'Leading'] as const;
+
+  const normalised: Question[] = all
+    .filter(r => r.fields.Question && r.fields.Circle)
+    .map(r => ({
+      recordId: r.id,
+      id: r.fields.ID || r.id,
+      circle: r.fields.Circle!,
+      skill: r.fields.Skillset || '',
+      goal: r.fields.Goal || '',
+      text: r.fields.Question!,
+    }))
+    .sort((a, b) => {
+      const circleDiff = circleOrder.indexOf(a.circle as any) - circleOrder.indexOf(b.circle as any);
+      if (circleDiff !== 0) return circleDiff;
+      return a.id.localeCompare(b.id);
+    });
+
+  return normalised;
 }
 
-function clamp(n: number, min = 1, max = 5) {
-  return Math.max(min, Math.min(max, n));
+// ────────────────────────────────────────────────────────────────────────────────
+// UI Components
+// ────────────────────────────────────────────────────────────────────────────────
+
+function ProgressBar({ value, max }: { value: number; max: number }) {
+  const pct = Math.round((value / max) * 100);
+  return (
+    <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
+      <div className="h-full bg-[#5F259F] transition-all" style={{ width: `${pct}%` }} />
+    </div>
+  );
 }
+
+function Pill({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="inline-flex items-center px-2 py-1 text-xs rounded-full bg-gray-100 border border-gray-200">
+      {children}
+    </span>
+  );
+}
+
+function RadioScale({ name, value, onChange }: { name: string; value: number | null; onChange: (v: number) => void }) {
+  const options = [1, 2, 3, 4, 5];
+  return (
+    <div className="flex gap-3 mt-4">
+      {options.map(n => (
+        <label key={n} className={`cursor-pointer select-none grid place-items-center w-10 h-10 rounded-xl border ${value === n ? 'border-[#5F259F] ring-2 ring-[#3AAA89]/40' : 'border-gray-300'}`}>
+          <input type="radio" name={name} value={n} className="hidden" onChange={() => onChange(n)} />
+          <span className="text-sm font-medium">{n}</span>
+        </label>
+      ))}
+    </div>
+  );
+}
+
+// ────────────────────────────────────────────────────────────────────────────────
+// Main Quiz Component
+// ────────────────────────────────────────────────────────────────────────────────
 
 export default function GrrowQuiz() {
+  const [questions, setQuestions] = useState<Question[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [index, setIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, number>>({});
-  const [step, setStep] = useState<"quiz" | "results">("quiz");
 
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem("grrow-quiz-answers");
-      if (saved) setAnswers(JSON.parse(saved));
-    } catch {}
+  React.useEffect(() => {
+    (async () => {
+      try {
+        const qs = await fetchAllQuestions();
+        setQuestions(qs);
+      } catch (e: any) {
+        setError(e?.message || 'Failed to load questions');
+      }
+    })();
   }, []);
 
-  useEffect(() => {
-    try { localStorage.setItem("grrow-quiz-answers", JSON.stringify(answers)); } catch {}
-  }, [answers]);
+  const current = questions?.[index] ?? null;
+  const total = questions?.length ?? 0;
 
-  const total = QUESTIONS.length;
-  const completed = Object.keys(answers).length;
-  const progress = Math.round((completed / total) * 100);
+  const circleCounts = useMemo(() => {
+    if (!questions) return {} as Record<string, number>;
+    return questions.reduce((acc, q) => {
+      acc[q.circle] = (acc[q.circle] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+  }, [questions]);
 
-  const byStrength = useMemo(() => groupBy(QUESTIONS, "strength"), []);
-  const byCircle = useMemo(() => groupBy(QUESTIONS, "circle"), []);
-
-  const canSubmit = completed === total;
-
-  function onChange(id: string, value: number) {
-    setAnswers((prev) => ({ ...prev, [id]: clamp(value) }));
+  function setAnswer(recordId: string, value: number) {
+    setAnswers(prev => ({ ...prev, [recordId]: value }));
   }
 
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!canSubmit) return;
-    setStep("results");
-    window.scrollTo({ top: 0, behavior: "smooth" });
+  function next() {
+    if (!questions) return;
+    if (index < questions.length - 1) setIndex(index + 1);
   }
 
-  if (step === "results") {
-    return <ResultsScreen answers={answers} byStrength={byStrength} byCircle={byCircle} onReset={() => setStep("quiz")} />;
+  function prev() {
+    if (!questions) return;
+    if (index > 0) setIndex(index - 1);
   }
+
+  const progress = Object.keys(answers).length;
 
   return (
-    <div className="max-w-3xl mx-auto p-6 text-gray-800">
+    <main className="max-w-2xl mx-auto p-6" style={{ fontFamily: 'Open Sans, ui-sans-serif, system-ui' }}>
       <header className="mb-6">
-        <h1 className="text-2xl font-semibold">Grrow Skillsets Quiz</h1>
-        <p className="text-sm text-gray-600">48 questions. Rate each statement from 1 (Rarely) to 5 (Always).</p>
+        <h1 className="text-2xl font-semibold text-gray-900">Grrow Quiz</h1>
+        <p className="text-sm text-gray-600">Live questions from Airtable • Circles: <Pill>Essentials</Pill> <Pill>Exploring</Pill> <Pill>Supporting</Pill> <Pill>Leading</Pill></p>
       </header>
 
-      {/* Progress */}
-      <div className="h-2 w-full rounded-full bg-gray-100 overflow-hidden mb-6">
-        <div className="h-full transition-all" style={{ width: `${progress}%`, background: BRAND.purple }} />
-      </div>
+      {!questions && !error && (
+        <div className="animate-pulse text-gray-500">Loading questions…</div>
+      )}
+      {error && (
+        <div className="text-red-600 border border-red-200 bg-red-50 p-3 rounded-xl">{error}</div>
+      )}
 
-      <form onSubmit={handleSubmit} className="space-y-8">
-        {STRENGTHS.map((strength) => (
-          <section key={strength} className="bg-white rounded-2xl shadow-sm border border-gray-100">
-            <div className="p-5 border-b border-gray-100 flex items-center gap-2">
-              <span className="inline-block w-2 h-2 rounded-full" style={{ background: BRAND.green }} />
-              <h2 className="text-lg font-semibold">{strength}</h2>
+      {current && (
+        <section className="space-y-4">
+          <ProgressBar value={progress} max={total || 1} />
+
+          <div className="text-xs text-gray-500">{progress}/{total} answered</div>
+
+          <div className="rounded-2xl border border-gray-200 p-5 shadow-sm">
+            <div className="flex items-center justify-between gap-4 mb-2">
+              <div className="flex flex-wrap items-center gap-2">
+                <Pill>{current.circle}</Pill>
+                {current.skill && <Pill>{current.skill}</Pill>}
+                {current.id && <Pill>{current.id}</Pill>}
+              </div>
             </div>
 
-            <div className="divide-y">
-              {CIRCLES.map((circle) => (
-                <div key={`${strength}-${circle}`} className="p-5">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="inline-block w-2 h-2 rounded-full" style={{ background: BRAND.purple }} />
-                    <h3 className="font-medium">{circle}</h3>
-                  </div>
+            {current.goal && <p className="text-sm text-gray-600 mb-2">{current.goal}</p>}
+            <h2 className="text-lg font-medium text-gray-900">{current.text}</h2>
 
-                  {QUESTIONS.filter(q => q.strength === strength && q.circle === circle).map((q) => (
-                    <QuestionRow key={q.id} q={q} value={answers[q.id]} onChange={onChange} />
-                  ))}
-                </div>
-              ))}
+            <RadioScale
+              name={current.recordId}
+              value={answers[current.recordId] ?? null}
+              onChange={(v) => setAnswer(current.recordId, v)}
+            />
+
+            <div className="flex justify-between mt-6">
+              <button onClick={prev} disabled={index === 0} className="px-4 py-2 rounded-xl border border-gray-300 disabled:opacity-50">Back</button>
+              <button onClick={next} className="px-4 py-2 rounded-xl text-white" style={{ backgroundColor: '#5F259F' }}>
+                {index < (total - 1) ? 'Next' : 'Finish'}
+              </button>
             </div>
-          </section>
-        ))}
+          </div>
+        </section>
+      )}
 
-        <div className="flex items-center justify-between pt-2">
-          <div className="text-sm text-gray-600">Please answer all questions to continue.</div>
-          <button
-            type="submit"
-            disabled={!canSubmit}
-            className={`px-4 py-2 rounded-xl text-white transition ${canSubmit ? "" : "opacity-50 cursor-not-allowed"}`}
-            style={{ background: BRAND.purple }}
-          >
-            View My Results
-          </button>
-        </div>
-      </form>
-    </div>
+      {questions && index >= questions.length && (
+        <section className="mt-8 space-y-4">
+          <h2 className="text-xl font-semibold">Nice! You’re done.</h2>
+          <p className="text-gray-600">We’ll soon turn this into **Keep / Focus / Grow** outputs. For now this is a local preview.</p>
+
+          <div className="rounded-2xl border border-gray-200 p-5">
+            <h3 className="font-medium mb-2">Your raw scores (preview)</h3>
+            <pre className="text-xs bg-gray-50 p-3 rounded-xl overflow-auto">{JSON.stringify(answers, null, 2)}</pre>
+          </div>
+
+          <div className="text-xs text-gray-500">
+            Circle counts: {Object.entries(circleCounts).map(([k, v]) => `${k}: ${v}`).join(' • ')}
+          </div>
+        </section>
+      )}
+
+      <footer className="mt-12 text-xs text-gray-400">
+        <div>Brand: Purple #5F259F • Green #3AAA89 • Font Open Sans</div>
+      </footer>
+    </main>
   );
 }
-
-function QuestionRow({ q, value, onChange }: { q: Question; value?: number; onChange: (id: string, value: number) => void }) {
-  return (
-    <div className="py-3">
-      <div className="mb-2">{q.text}</div>
-      <div className="flex items-center gap-3 text-sm">
-        {[1,2,3,4,5].map((n) => (
-          <label key={n} className={`flex items-center gap-2 px-3 py-2 rounded-xl border ${value === n ? "ring-2" : ""}`} style={{ borderColor: value === n ? BRAND.purple : "#e5e7eb" }}>
-            <input type="radio" name={q.id} value={n} checked={value === n} onChange={() => onChange(q.id, n)} className="hidden" />
-            <span className="font-medium">{n}</span>
-          </label>
-        ))}
-        <span className="ml-2 text-gray-500">1 = Rarely, 5 = Always</span>
-      </div>
-    </div>
-  );
-}
-
-function ResultsScreen({ answers, byStrength, byCircle, onReset }: {
-  answers: Record<string, number>;
-  byStrength: Record<string, Question[]>;
-  byCircle: Record<string, Question[]>;
-  onReset: () => void;
-}) {
-  const strengthScores = Object.entries(byStrength).map(([strength, qs]) => {
-    const vals = qs.map(q => answers[q.id] ?? 0);
-    return { label: strength, avg: Number(average(vals).toFixed(2)) };
-  });
-
-  const circleScores = Object.entries(byCircle).map(([circle, qs]) => {
-    const vals = qs.map(q => answers[q.id] ?? 0);
-    return { label: circle, avg: Number(average(vals).toFixed(2)) };
-  });
-
-  const sorted = [...strengthScores].sort((a,b) => b.avg - a.avg);
-  const keep = sorted[0];
-  const focus = sorted[sorted.length - 1];
-  const grow = sorted[Math.max(1, sorted.length - 2)];
-
-  return (
-    <div className="max-w-3xl mx-auto p-6">
-      <h2 className="text-2xl font-semibold mb-2">Your Results</h2>
-      <p className="text-sm text-gray-600 mb-6">Averages by strength and circle. Use picks to guide your Keep / Focus / Grow discussion.</p>
-
-      <section className="bg-white rounded-2xl shadow-sm border border-gray-100 mb-6">
-        <div className="p-5 border-b border-gray-100 flex items-center gap-2">
-          <span className="inline-block w-2 h-2 rounded-full" style={{ background: BRAND.purple }} />
-          <h3 className="text-lg font-semibold">By Strength</h3>
-        </div>
-        <div className="p-5 grid grid-cols-1 md:grid-cols-2 gap-3">
-          {strengthScores.map(s => (
-            <StatBar key={s.label} label={s.label} value={s.avg} color={BRAND.purple} />
-          ))}
-        </div>
-      </section>
-
-      <section className="bg-white rounded-2xl shadow-sm border border-gray-100 mb-6">
-        <div className="p-5 border-b border-gray-100 flex items-center gap-2">
-          <span className="inline-block w-2 h-2 rounded-full" style={{ background: BRAND.green }} />
-          <h3 className="text-lg font-semibold">By Circle</h3>
-        </div>
-        <div className="p-5 grid grid-cols-1 md:grid-cols-2 gap-3">
-          {circleScores.map(s => (
-            <StatBar key={s.label} label={s.label} value={s.avg} color={BRAND.green} />
-          ))}
-        </div>
-      </section>
-
-      <section className="bg-white rounded-2xl shadow-sm border border-gray-100 mb-6">
-        <div className="p-5 border-b border-gray-100 flex items-center gap-2">
-          <span className="inline-block w-2 h-2 rounded-full" style={{ background: BRAND.purple }} />
-          <h3 className="text-lg font-semibold">Keep / Focus / Grow</h3>
-        </div>
-        <div className="p-5 grid grid-cols-1 md:grid-cols-3 gap-4">
-          <PickCard label="Keep" item={keep} color={BRAND.green} subtitle="Going well — keep it up" />
-          <PickCard label="Focus" item={focus} color={BRAND.purple} subtitle="Needs attention now" />
-          <PickCard label="Grow" item={grow} color="#111827" subtitle="Look for opportunities" />
-        </div>
-      </section>
-
-      <div className="flex items-center gap-3 mt-6">
-        <button onClick={onReset} className="px-4 py-2 rounded-xl border" style={{ borderColor: "#e5e7eb" }}>Back to quiz</button>
-      </div>
-    </div>
-  );
-}
-
-function StatBar({ label, value, color }: { label: string; value: number; color: string }) {
-  const pct = Math.round((value / 5) * 100);
-  return (
-    <div>
-      <div className="flex items-center justify-between text-sm mb-2">
-        <span className="font-medium">{label}</span>
-        <span className="text-gray-600">{value.toFixed(2)} / 5</span>
-      </div>
-      <div className="h-2 rounded-full bg-gray-100 overflow-hidden">
-        <div className="h-full" style={{ width: `${pct}%`, background: color }} />
-      </div>
-    </div>
-  );
-}
-
-function PickCard({ label, item, subtitle, color }: { label: string; item: { label: string; avg: number } | undefined; subtitle: string; color: string }) {
-  if (!item) return null;
-  return (
-    <div className="p-4 rounded-2xl border bg-white" style={{ borderColor: "#e5e7eb" }}>
-      <div className="text-xs uppercase tracking-wide mb-1" style={{ color }}>{label}</div>
-      <div className="text-lg font-semibold mb-1">{item.label}</div>
-      <div className="text-sm text-gray-600 mb-3">{subtitle}</div>
-      <div className="text-sm">Average score: <strong>{item.avg.toFixed(2)}</strong></div>
-    </div>
-  );
-}
-
