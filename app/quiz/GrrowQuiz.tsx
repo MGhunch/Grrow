@@ -1,109 +1,44 @@
-// app/quiz/page.tsx (Next.js 13+/App Router)
-// - Server component fetches questions directly from Airtable (read-only)
-// - Passes normalised data to a small client Quiz component
-// - Tailwind CSS styling; brand fonts/colors inline
+// app/quiz/GrrowQuiz.tsx
+"use client";
 
-'use client';
+import React, { useEffect, useMemo, useState } from "react";
 
-// NOTE: Because canvas renders a single file, this exports a client component that
-// performs the fetch on the server via an API route-like call using NEXT_PUBLIC envs
-// or (preferably) you can move fetch logic to a dedicated server route later.
+// --- Types ---------------------------------------------------------------
+type Circle = "Essentials" | "Exploring" | "Supporting" | "Leading";
 
-import React, { useMemo, useState } from 'react';
-
-// ────────────────────────────────────────────────────────────────────────────────
-// Types
-// ────────────────────────────────────────────────────────────────────────────────
-
-type AirtableRecord = {
+export type Question = {
+  recordId: string;
   id: string;
-  fields: {
-    ID?: string;
-    Circle?: 'Essentials' | 'Exploring' | 'Supporting' | 'Leading';
-    Skillset?: string; // e.g. Clarify, Simplify, Solve, Innovate, etc.
-    Goal?: string; // objective text
-    Question?: string;
-    Active?: boolean;
-  };
-};
-
-type Question = {
-  recordId: string; // Airtable record id
-  id: string; // your readable ID (e.g., CT-CLA-01)
-  circle: NonNullable<AirtableRecord['fields']['Circle']>;
+  circle: Circle;
   skill: string;
   goal: string;
   text: string;
 };
 
-// ────────────────────────────────────────────────────────────────────────────────
-// Airtable fetch (client-side for this single-file demo)
-// In production, prefer server-side fetch to keep the token secret.
-// Create a read-only PAT scoped to this base (records:read) and expose it as a
-// NEXT_PUBLIC_* only if you accept the tradeoff (view-only, limited scope).
-// Better: move fetch to a Next.js route handler (app/api/questions/route.ts) and
-// call it from the client. For now we keep it self‑contained.
-// ────────────────────────────────────────────────────────────────────────────────
-
-const AIRTABLE_TOKEN = process.env.NEXT_PUBLIC_AIRTABLE_TOKEN as string;
-const AIRTABLE_BASE = process.env.NEXT_PUBLIC_AIRTABLE_BASE as string; // appXXXXXXXX
-const AIRTABLE_TABLE = process.env.NEXT_PUBLIC_AIRTABLE_TABLE as string; // Questions
-
-if (!AIRTABLE_TOKEN || !AIRTABLE_BASE || !AIRTABLE_TABLE) {
-  // eslint-disable-next-line no-console
-  console.warn('Airtable env vars missing. Set NEXT_PUBLIC_AIRTABLE_* in .env.local');
-}
-
+// --- Utilities -----------------------------------------------------------
 async function fetchAllQuestions(): Promise<Question[]> {
-  const headers = { Authorization: `Bearer ${AIRTABLE_TOKEN}` } as const;
-  const url = new URL(`https://api.airtable.com/v0/${AIRTABLE_BASE}/${encodeURIComponent(AIRTABLE_TABLE)}`);
-  // If you add an "Active" checkbox, uncomment the filterByFormula below
-  // url.searchParams.set('filterByFormula', "{Active} = 1");
-  url.searchParams.set('sort[0][field]', 'ID');
-  url.searchParams.set('sort[0][direction]', 'asc');
-
-  let offset: string | undefined;
-  const all: AirtableRecord[] = [];
-
-  do {
-    if (offset) url.searchParams.set('offset', offset);
-    const res = await fetch(url.toString(), { headers, cache: 'no-store' });
-    if (!res.ok) throw new Error('Failed to fetch Airtable');
-    const data: { records: AirtableRecord[]; offset?: string } = await res.json();
-    all.push(...data.records);
-    offset = data.offset;
-  } while (offset);
-
-  const circleOrder = ['Essentials', 'Exploring', 'Supporting', 'Leading'] as const;
-
-  const normalised: Question[] = all
-    .filter(r => r.fields.Question && r.fields.Circle)
-    .map(r => ({
-      recordId: r.id,
-      id: r.fields.ID || r.id,
-      circle: r.fields.Circle!,
-      skill: r.fields.Skillset || '',
-      goal: r.fields.Goal || '',
-      text: r.fields.Question!,
-    }))
-    .sort((a, b) => {
-      const circleDiff = circleOrder.indexOf(a.circle as any) - circleOrder.indexOf(b.circle as any);
-      if (circleDiff !== 0) return circleDiff;
-      return a.id.localeCompare(b.id);
-    });
-
-  return normalised;
+  const res = await fetch("/api/questions", { cache: "no-store" });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body?.error || `Failed to load questions (${res.status})`);
+  }
+  const data = await res.json();
+  return (data.questions || []) as Question[];
 }
 
-// ────────────────────────────────────────────────────────────────────────────────
-// UI Components
-// ────────────────────────────────────────────────────────────────────────────────
+function classNames(...xs: Array<string | false | undefined>) {
+  return xs.filter(Boolean).join(" ");
+}
 
+// --- UI Bits -------------------------------------------------------------
 function ProgressBar({ value, max }: { value: number; max: number }) {
-  const pct = Math.round((value / max) * 100);
+  const pct = Math.round((value / Math.max(max, 1)) * 100);
   return (
     <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
-      <div className="h-full bg-[#5F259F] transition-all" style={{ width: `${pct}%` }} />
+      <div
+        className="h-full transition-all"
+        style={{ width: `${pct}%`, backgroundColor: "#5F259F" }}
+      />
     </div>
   );
 }
@@ -116,13 +51,35 @@ function Pill({ children }: { children: React.ReactNode }) {
   );
 }
 
-function RadioScale({ name, value, onChange }: { name: string; value: number | null; onChange: (v: number) => void }) {
+function RadioScale({
+  name,
+  value,
+  onChange,
+}: {
+  name: string;
+  value: number | null;
+  onChange: (v: number) => void;
+}) {
   const options = [1, 2, 3, 4, 5];
   return (
     <div className="flex gap-3 mt-4">
-      {options.map(n => (
-        <label key={n} className={`cursor-pointer select-none grid place-items-center w-10 h-10 rounded-xl border ${value === n ? 'border-[#5F259F] ring-2 ring-[#3AAA89]/40' : 'border-gray-300'}`}>
-          <input type="radio" name={name} value={n} className="hidden" onChange={() => onChange(n)} />
+      {options.map((n) => (
+        <label
+          key={n}
+          className={classNames(
+            "cursor-pointer select-none grid place-items-center w-10 h-10 rounded-xl border",
+            value === n
+              ? "border-[#5F259F] ring-2 ring-[#3AAA89]/40"
+              : "border-gray-300"
+          )}
+        >
+          <input
+            type="radio"
+            name={name}
+            value={n}
+            className="hidden"
+            onChange={() => onChange(n)}
+          />
           <span className="text-sm font-medium">{n}</span>
         </label>
       ))}
@@ -130,29 +87,27 @@ function RadioScale({ name, value, onChange }: { name: string; value: number | n
   );
 }
 
-// ────────────────────────────────────────────────────────────────────────────────
-// Main Quiz Component
-// ────────────────────────────────────────────────────────────────────────────────
-
+// --- Main Component -------------------------------------------------------
 export default function GrrowQuiz() {
   const [questions, setQuestions] = useState<Question[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [index, setIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, number>>({});
 
-  React.useEffect(() => {
+  useEffect(() => {
     (async () => {
       try {
         const qs = await fetchAllQuestions();
         setQuestions(qs);
       } catch (e: any) {
-        setError(e?.message || 'Failed to load questions');
+        setError(e?.message || "Failed to load questions");
       }
     })();
   }, []);
 
   const current = questions?.[index] ?? null;
   const total = questions?.length ?? 0;
+  const progress = Object.keys(answers).length;
 
   const circleCounts = useMemo(() => {
     if (!questions) return {} as Record<string, number>;
@@ -163,7 +118,7 @@ export default function GrrowQuiz() {
   }, [questions]);
 
   function setAnswer(recordId: string, value: number) {
-    setAnswers(prev => ({ ...prev, [recordId]: value }));
+    setAnswers((prev) => ({ ...prev, [recordId]: value }));
   }
 
   function next() {
@@ -176,26 +131,39 @@ export default function GrrowQuiz() {
     if (index > 0) setIndex(index - 1);
   }
 
-  const progress = Object.keys(answers).length;
-
   return (
-    <main className="max-w-2xl mx-auto p-6" style={{ fontFamily: 'Open Sans, ui-sans-serif, system-ui' }}>
+    <main
+      className="max-w-2xl mx-auto p-6"
+      style={{ fontFamily: "Open Sans, ui-sans-serif, system-ui" }}
+    >
       <header className="mb-6">
         <h1 className="text-2xl font-semibold text-gray-900">Grrow Quiz</h1>
-        <p className="text-sm text-gray-600">Live questions from Airtable • Circles: <Pill>Essentials</Pill> <Pill>Exploring</Pill> <Pill>Supporting</Pill> <Pill>Leading</Pill></p>
+        <p className="text-sm text-gray-600">
+          Live questions from Airtable • Circles: <Pill>Essentials</Pill>{" "}
+          <Pill>Exploring</Pill> <Pill>Supporting</Pill> <Pill>Leading</Pill>
+        </p>
       </header>
 
       {!questions && !error && (
         <div className="animate-pulse text-gray-500">Loading questions…</div>
       )}
+
       {error && (
-        <div className="text-red-600 border border-red-200 bg-red-50 p-3 rounded-xl">{error}</div>
+        <div className="text-red-600 border border-red-200 bg-red-50 p-3 rounded-xl">
+          {error}
+        </div>
+      )}
+
+      {questions && questions.length === 0 && !error && (
+        <div className="mt-4 text-orange-700 bg-orange-50 border border-orange-200 p-3 rounded-xl">
+          No questions found. Check env vars (BASE/TABLE), table name “Questions”,
+          and that rows have both “Question” and “Circle”.
+        </div>
       )}
 
       {current && (
         <section className="space-y-4">
           <ProgressBar value={progress} max={total || 1} />
-
           <div className="text-xs text-gray-500">{progress}/{total} answered</div>
 
           <div className="rounded-2xl border border-gray-200 p-5 shadow-sm">
@@ -207,7 +175,9 @@ export default function GrrowQuiz() {
               </div>
             </div>
 
-            {current.goal && <p className="text-sm text-gray-600 mb-2">{current.goal}</p>}
+            {current.goal && (
+              <p className="text-sm text-gray-600 mb-2">{current.goal}</p>
+            )}
             <h2 className="text-lg font-medium text-gray-900">{current.text}</h2>
 
             <RadioScale
@@ -217,9 +187,19 @@ export default function GrrowQuiz() {
             />
 
             <div className="flex justify-between mt-6">
-              <button onClick={prev} disabled={index === 0} className="px-4 py-2 rounded-xl border border-gray-300 disabled:opacity-50">Back</button>
-              <button onClick={next} className="px-4 py-2 rounded-xl text-white" style={{ backgroundColor: '#5F259F' }}>
-                {index < (total - 1) ? 'Next' : 'Finish'}
+              <button
+                onClick={prev}
+                disabled={index === 0}
+                className="px-4 py-2 rounded-xl border border-gray-300 disabled:opacity-50"
+              >
+                Back
+              </button>
+              <button
+                onClick={next}
+                className="px-4 py-2 rounded-xl text-white"
+                style={{ backgroundColor: "#5F259F" }}
+              >
+                {index < (total - 1) ? "Next" : "Finish"}
               </button>
             </div>
           </div>
@@ -229,15 +209,19 @@ export default function GrrowQuiz() {
       {questions && index >= questions.length && (
         <section className="mt-8 space-y-4">
           <h2 className="text-xl font-semibold">Nice! You’re done.</h2>
-          <p className="text-gray-600">We’ll soon turn this into **Keep / Focus / Grow** outputs. For now this is a local preview.</p>
+          <p className="text-gray-600">
+            We’ll soon turn this into <b>Keep / Focus / Grow</b> outputs. For now this is a local preview.
+          </p>
 
           <div className="rounded-2xl border border-gray-200 p-5">
             <h3 className="font-medium mb-2">Your raw scores (preview)</h3>
-            <pre className="text-xs bg-gray-50 p-3 rounded-xl overflow-auto">{JSON.stringify(answers, null, 2)}</pre>
+            <pre className="text-xs bg-gray-50 p-3 rounded-xl overflow-auto">
+              {JSON.stringify(answers, null, 2)}
+            </pre>
           </div>
 
           <div className="text-xs text-gray-500">
-            Circle counts: {Object.entries(circleCounts).map(([k, v]) => `${k}: ${v}`).join(' • ')}
+            Circle counts: {Object.entries(circleCounts).map(([k, v]) => `${k}: ${v}`).join(" • ")}
           </div>
         </section>
       )}
@@ -248,3 +232,4 @@ export default function GrrowQuiz() {
     </main>
   );
 }
+
