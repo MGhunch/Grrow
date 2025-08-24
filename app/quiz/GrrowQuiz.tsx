@@ -1,207 +1,186 @@
 "use client";
-import React, { useEffect, useMemo, useState } from "react";
 
-// Types (match API)
-type Circle = "Essentials" | "Exploring" | "Supporting" | "Leading";
-type Question = {
-  recordId: string;
-  id: string;
-  strength: string;
-  circle: Circle;
-  skill: string;
-  goal: string;
-  text: string;
+import { useEffect, useMemo, useState } from "react";
+
+type Question = { id: string; text: string; questionOrder: 1|2|3 };
+type StrengthBlock = {
+  strength: "Critical thinking" | "Creativity" | "Collaboration" | "Communication";
+  strengthOrder: number;
+  skillset: string;       // e.g., Clarify / Simplify / Solve / Innovate ...
+  objective: string;      // show once at start of block
+  questions: Question[];  // length = 3
 };
 
-// Fetch from our server route
-async function fetchAllQuestions(): Promise<Question[]> {
-  const res = await fetch("/api/questions", { cache: "no-store" });
-  if (!res.ok) {
-    const body = await res.json().catch(() => ({}));
-    throw new Error(body?.error || `Failed to load questions (${res.status})`);
-  }
-  const data = await res.json();
-  return (data.questions || []) as Question[];
+type QuizData = {
+  circle: "ESSENTIALS" | "EXPLORING" | "SUPPORTING" | "LEADING";
+  version: string;
+  strengths: StrengthBlock[];
+};
+
+type AnswerMap = Record<string, number>; // questionId -> 0..100
+
+const ANCHORS = ["Not yet", "Sometimes", "Mostly", "Consistently"];
+
+function bucketColor(score: number) {
+  if (score >= 75) return "text-[#5F259F]";      // Purple = Nailing
+  if (score >= 50) return "text-[#3AAA89]";      // Green = Growing
+  if (score >= 25) return "text-[#3AAA89]/50";   // Light Green = Learning
+  return "text-gray-300";                         // White = Not yet
 }
 
-// Small helpers
-function classNames(...xs: Array<string | false | undefined>) {
-  return xs.filter(Boolean).join(" ");
-}
-
-function ProgressBar({ value, max }: { value: number; max: number }) {
-  const pct = Math.round((value / Math.max(max, 1)) * 100);
-  return (
-    <div className="h-2.5 w-full bg-gray-200 rounded-full overflow-hidden">
-      <div className="h-full transition-all" style={{ width: `${pct}%`, backgroundColor: "var(--brand-purple)" }} />
-    </div>
-  );
-}
-
-function Pill({ children }: { children: React.ReactNode }) {
-  return <span className="pill">{children}</span>;
-}
-
-function RadioScale({
-  name,
-  value,
-  onChange,
-}: {
-  name: string;
-  value: number | null;
-  onChange: (v: number) => void;
-}) {
-  const options = [1, 2, 3, 4, 5];
-  return (
-    <div className="flex gap-3 mt-4">
-      {options.map((n) => (
-        <label
-          key={n}
-          className={classNames(
-            "cursor-pointer select-none grid place-items-center w-12 h-12 rounded-2xl border transition",
-            value === n
-              ? "border-[var(--brand-purple)] ring-2 ring-[color:var(--brand-green)]/40"
-              : "border-gray-300 hover:border-gray-400"
-          )}
-        >
-          <input
-            type="radio"
-            name={name}
-            value={n}
-            className="hidden"
-            onChange={() => onChange(n)}
-          />
-          <span className="text-sm font-medium">{n}</span>
-        </label>
-      ))}
-    </div>
-  );
+function bucketLabel(score: number) {
+  if (score >= 75) return "Nailing it";
+  if (score >= 50) return "Growing";
+  if (score >= 25) return "Learning";
+  return "Not yet";
 }
 
 export default function GrrowQuiz() {
-  const [questions, setQuestions] = useState<Question[] | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [index, setIndex] = useState(0);
-  const [answers, setAnswers] = useState<Record<string, number>>({});
+  const [circle, setCircle] = useState<QuizData["circle"]>("ESSENTIALS");
+  const [loading, setLoading] = useState(false);
+  const [data, setData] = useState<QuizData | null>(null);
+  const [answers, setAnswers] = useState<AnswerMap>({});
+  const [step, setStep] = useState<{ s: number; q: number } | null>(null); // s=strength idx, q=0=intro or 1..3
 
+  // fetch circle data
   useEffect(() => {
-    (async () => {
-      try {
-        const qs = await fetchAllQuestions();
-        setQuestions(qs);
-      } catch (e: any) {
-        setError(e?.message || "Failed to load questions");
-      }
-    })();
-  }, []);
+    const fetcher = async () => {
+      setLoading(true);
+      const res = await fetch(`/api/questions?circle=${circle}&version=v1.0`, { cache: "no-store" });
+      const payload = (await res.json()) as QuizData;
+      setData(payload);
+      setAnswers({});
+      setStep({ s: 0, q: 0 }); // start at first strength intro
+      setLoading(false);
+    };
+    fetcher();
+  }, [circle]);
 
-  const current = questions?.[index] ?? null;
-  const total = questions?.length ?? 0;
-  const progress = Object.keys(answers).length;
+  const current = useMemo(() => {
+    if (!data || !step) return null;
+    const block = data.strengths[step.s];
+    return { block, qIndex: step.q }; // qIndex: 0=intro, 1..3=question idx
+  }, [data, step]);
 
-  const circleCounts = useMemo(() => {
-    if (!questions) return {} as Record<string, number>;
-    return questions.reduce((acc, q) => {
-      acc[q.circle] = (acc[q.circle] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
-  }, [questions]);
+  const circleAvg = useMemo(() => {
+    const vals = Object.values(answers);
+    if (!vals.length) return 0;
+    return Math.round(vals.reduce((a, b) => a + b, 0) / vals.length);
+  }, [answers]);
 
-  function setAnswer(recordId: string, value: number) {
-    setAnswers((prev) => ({ ...prev, [recordId]: value }));
+  function setAnswer(id: string, val: number) {
+    setAnswers((prev) => ({ ...prev, [id]: val }));
   }
+
   function next() {
-    if (!questions) return;
-    if (index < questions.length - 1) setIndex(index + 1);
+    if (!data || !step) return;
+    const { s, q } = step;
+    // 0=intro → go to first question; 1..2 → next; 3 → next strength intro or finish
+    if (q === 0) return setStep({ s, q: 1 });
+    if (q < 3) return setStep({ s, q: (q + 1) as 1 | 2 | 3 });
+    if (s < data.strengths.length - 1) return setStep({ s: s + 1, q: 0 });
+    // end of circle
+    setStep(null);
   }
-  function prev() {
-    if (!questions) return;
-    if (index > 0) setIndex(index - 1);
+
+  function back() {
+    if (!data || !step) return;
+    const { s, q } = step;
+    if (q > 0) return setStep({ s, q: (q - 1) as 0 | 1 | 2 });
+    if (s > 0) return setStep({ s: s - 1, q: 3 });
   }
+
+  if (loading || !data) {
+    return <div className="p-6 text-gray-500">Loading…</div>;
+  }
+
+  // Circle summary when step is null
+  if (!step) {
+    // compute per-skillset averages
+    const blocks = data.strengths.map((b) => {
+      const ids = b.questions.map((q) => q.id);
+      const nums = ids.map((id) => answers[id]).filter((n) => typeof n === "number");
+      const avg = nums.length ? Math.round(nums.reduce((a, c) => a + c, 0) / nums.length) : 0;
+      return { skillset: b.skillset, avg };
+    });
+
+    return (
+      <div className="max-w-2xl mx-auto p-6">
+        <h1 className="text-2xl font-semibold mb-2">{data.circle} — Summary</h1>
+        <p className="text-gray-600 mb-6">Great work. Here’s your snapshot for this circle.</p>
+
+        <ul className="space-y-3">
+          {blocks.map(({ skillset, avg }) => (
+            <li key={skillset} className="flex items-center justify-between rounded-xl border p-4">
+              <span className="font-medium">{skillset}</span>
+              <span className={`font-semibold ${bucketColor(avg)}`}>{avg} · {bucketLabel(avg)}</span>
+            </li>
+          ))}
+        </ul>
+
+        <div className="mt-6 flex items-center justify-between">
+          <div className="text-sm text-gray-500">Circle average: <b>{circleAvg}</b> ({bucketLabel(circleAvg)})</div>
+          <div className="flex gap-2">
+            <button className="px-4 py-2 rounded-xl border" onClick={() => setCircle("EXPLORING")}>Next circle</button>
+            <button className="px-4 py-2 rounded-xl bg-black text-white" onClick={() => setCircle("ESSENTIALS")}>Redo</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Render either intro card (qIndex=0) or question card (1..3)
+  const { block, qIndex } = current!;
+  const question = qIndex ? block.questions[qIndex - 1] : null;
 
   return (
-    <main className="max-w-[720px] mx-auto p-6" style={{ fontFamily: "Open Sans, ui-sans-serif, system-ui" }}>
-      <header className="mb-6">
-        <h1 className="text-2xl font-semibold text-gray-900">Grrow Quiz</h1>
-        <p className="text-sm text-gray-600">
-          Live questions from Airtable • Circles: <Pill>Essentials</Pill>{" "}
-          <Pill>Exploring</Pill> <Pill>Supporting</Pill> <Pill>Leading</Pill>
-        </p>
-      </header>
+    <div className="max-w-xl mx-auto p-6">
+      <div className="mb-3">
+        <span className="inline-block text-xs tracking-wide rounded-full bg-gray-100 px-3 py-1">{data.circle}</span>
+      </div>
 
-      {!questions && !error && (
-        <div className="animate-pulse text-gray-500">Loading questions…</div>
-      )}
-
-      {error && (
-        <div className="text-red-600 border border-red-200 bg-red-50 p-3 rounded-2xl">
-          {error}
+      {qIndex === 0 ? (
+        // Skillset intro
+        <div className="rounded-2xl border p-6 shadow-sm">
+          <h2 className="text-xl font-semibold">{block.skillset}</h2>
+          <p className="mt-2 text-gray-600">{block.objective}</p>
+          <button onClick={next} className="mt-5 px-4 py-2 rounded-xl bg-[#5F259F] text-white">
+            Start questions
+          </button>
         </div>
-      )}
+      ) : (
+        // Question card
+        <div className="rounded-2xl border p-6 shadow-sm">
+          <h2 className="text-xl font-semibold">{block.skillset}</h2>
+          <p className="mt-2 text-gray-800">{question!.text}</p>
 
-      {questions && questions.length === 0 && !error && (
-        <div className="mt-4 text-orange-700 bg-orange-50 border border-orange-200 p-3 rounded-2xl">
-          No questions found. Check env vars (BASE/TABLE), table name “Questions”,
-          and that rows have both “Question” and “Circle”.
-        </div>
-      )}
-
-      {current && (
-        <section className="space-y-4">
-          <ProgressBar value={progress} max={total || 1} />
-          <div className="text-xs text-gray-500">{progress}/{total} answered</div>
-
-          <div className="card p-5">
-            <div className="flex flex-wrap items-center gap-2 mb-2">
-              <Pill>{current.circle}</Pill>
-              {current.strength && <Pill>{current.strength}</Pill>}
-              {current.skill && <Pill>{current.skill}</Pill>}
-              {current.id && <Pill>{current.id}</Pill>}
-            </div>
-
-            {current.goal && <p className="text-sm text-gray-600 mb-2">{current.goal}</p>}
-            <h2 className="text-lg font-medium text-gray-900">{current.text}</h2>
-
-            <RadioScale
-              name={current.recordId}
-              value={answers[current.recordId] ?? null}
-              onChange={(v) => setAnswer(current.recordId, v)}
+          {/* Slider */}
+          <div className="mt-5">
+            <input
+              type="range"
+              min={0}
+              max={100}
+              step={1}
+              value={answers[question!.id] ?? 0}
+              onChange={(e) => setAnswer(question!.id, Number(e.target.value))}
+              className="w-full"
             />
-
-            <div className="flex justify-between mt-6">
-              <button onClick={prev} disabled={index === 0} className="btn btn-outline">Back</button>
-              <button onClick={next} className="btn btn-primary">
-                {index < (total - 1) ? "Next" : "Finish"}
-              </button>
+            <div className="flex justify-between text-xs text-gray-500 mt-1">
+              {ANCHORS.map((a) => <span key={a}>{a}</span>)}
             </div>
+            <div className="mt-2 text-sm text-gray-600">Score: <b>{answers[question!.id] ?? 0}</b></div>
           </div>
-        </section>
+
+          <div className="mt-6 flex justify-between">
+            <button onClick={back} className="px-4 py-2 rounded-xl border">Back</button>
+            <button onClick={next} className="px-4 py-2 rounded-xl bg-black text-white">Next</button>
+          </div>
+
+          <div className="mt-4 text-xs text-gray-500">
+            {block.strength} — question {qIndex} of 3
+          </div>
+        </div>
       )}
-
-      {questions && index >= questions.length && (
-        <section className="mt-8 space-y-4">
-          <h2 className="text-xl font-semibold">Nice! You’re done.</h2>
-          <p className="text-gray-600">
-            We’ll soon turn this into <b>Keep / Focus / Grow</b> outputs. For now this is a local preview.
-          </p>
-
-          <div className="card p-5">
-            <h3 className="font-medium mb-2">Your raw scores (preview)</h3>
-            <pre className="text-xs bg-gray-50 p-3 rounded-2xl overflow-auto">
-              {JSON.stringify(answers, null, 2)}
-            </pre>
-          </div>
-
-          <div className="text-xs text-gray-500">
-            Circle counts: {Object.entries(circleCounts).map(([k, v]) => `${k}: ${v}`).join(" • ")}
-          </div>
-        </section>
-      )}
-
-      <footer className="mt-12 text-xs text-gray-400">
-        <div>Brand: Purple #5F259F • Green #3AAA89 • Font Open Sans</div>
-      </footer>
-    </main>
+    </div>
   );
 }
-
