@@ -9,7 +9,7 @@ const BRAND = {
 };
 
 // --- DATA --------------------------------------------------------------
-const CIRCLES = ["Essentials", "Exploring", "Shaping", "Leading"] as const;
+const CIRCLES = ["Essentials", "Exploring", "Supporting", "Leading"] as const;
 const STRENGTHS = [
   "Creativity",
   "Collaboration",
