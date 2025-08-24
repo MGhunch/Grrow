@@ -1,0 +1,10 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root{
+  --brand-purple:#5F259F;
+  --brand-green:#3AAA89;
+}
+html, body { font-family: 'Open Sans', sans-serif; }
