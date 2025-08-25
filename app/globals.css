@@ -17,6 +17,17 @@ body{
   background:#f9fafb;
 }
 
+/* Skillset title (used for quiz headings like "Skillset: Clarify") */
+.grrow-skillset-title{
+  font-family: 'Playfair Display', 'Open Sans', serif;
+  font-weight: 700;
+  font-size: clamp(26px, 3.2vw, 32px);
+  line-height: 1.2;
+  letter-spacing: -0.005em;
+  margin-bottom: .75rem;
+  color: var(--brand-purple);
+}
+
 /* UI atoms */
 .pill{ @apply inline-flex items-center px-2 py-1 text-xs rounded-full bg-gray-100 border border-gray-200; }
 .card{ @apply rounded-2xl border border-gray-200 bg-white shadow-sm; }
