@@ -2,9 +2,9 @@
 
 import { useEffect, useMemo, useState } from "react";
 
-type Question = { id: string; text: string; questionOrder: 1|2|3 };
+type Question = { id: string; text: string; questionOrder: 1 | 2 | 3 };
 type StrengthBlock = {
-  strength: "Critical thinking" | "Creativity" | "Collaboration" | "Communication";
+  strength: "Critical Thinking" | "Creativity" | "Collaboration" | "Communication";
   strengthOrder: number;
   skillset: string;       // e.g., Clarify / Simplify / Solve / Innovate ...
   objective: string;      // show once at start of block
@@ -20,12 +20,13 @@ type QuizData = {
 type AnswerMap = Record<string, number>; // questionId -> 0..100
 
 const ANCHORS = ["Not yet", "Sometimes", "Mostly", "Consistently"];
+const CIRCLES: QuizData["circle"][] = ["ESSENTIALS", "EXPLORING", "SUPPORTING", "LEADING"];
 
 function bucketColor(score: number) {
   if (score >= 75) return "text-[#5F259F]";      // Purple = Nailing
   if (score >= 50) return "text-[#3AAA89]";      // Green = Growing
   if (score >= 25) return "text-[#3AAA89]/50";   // Light Green = Learning
-  return "text-gray-300";                         // White = Not yet
+  return "text-gray-300";                         // Not yet
 }
 
 function bucketLabel(score: number) {
@@ -52,6 +53,8 @@ export default function GrrowQuiz() {
       setAnswers({});
       setStep({ s: 0, q: 0 }); // start at first strength intro
       setLoading(false);
+      // scroll to top on circle change
+      if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
     };
     fetcher();
   }, [circle]);
@@ -90,19 +93,27 @@ export default function GrrowQuiz() {
     if (s > 0) return setStep({ s: s - 1, q: 3 });
   }
 
+  function nextCircle() {
+    const idx = CIRCLES.indexOf(circle);
+    const next = CIRCLES[(idx + 1) % CIRCLES.length];
+    setCircle(next);
+  }
+
   if (loading || !data) {
     return <div className="p-6 text-gray-500">Loading…</div>;
   }
 
   // Circle summary when step is null
   if (!step) {
-    // compute per-skillset averages
     const blocks = data.strengths.map((b) => {
       const ids = b.questions.map((q) => q.id);
       const nums = ids.map((id) => answers[id]).filter((n) => typeof n === "number");
       const avg = nums.length ? Math.round(nums.reduce((a, c) => a + c, 0) / nums.length) : 0;
       return { skillset: b.skillset, avg };
     });
+
+    const idx = CIRCLES.indexOf(circle);
+    const isLast = idx === CIRCLES.length - 1;
 
     return (
       <div className="max-w-2xl mx-auto p-6">
@@ -121,8 +132,10 @@ export default function GrrowQuiz() {
         <div className="mt-6 flex items-center justify-between">
           <div className="text-sm text-gray-500">Circle average: <b>{circleAvg}</b> ({bucketLabel(circleAvg)})</div>
           <div className="flex gap-2">
-            <button className="px-4 py-2 rounded-xl border" onClick={() => setCircle("EXPLORING")}>Next circle</button>
-            <button className="px-4 py-2 rounded-xl bg-black text-white" onClick={() => setCircle("ESSENTIALS")}>Redo</button>
+            <button className="px-4 py-2 rounded-xl border" onClick={() => setCircle("ESSENTIALS")}>Redo</button>
+            <button className="px-4 py-2 rounded-xl bg-black text-white" onClick={nextCircle}>
+              {isLast ? "Finish & Restart" : "Next circle"}
+            </button>
           </div>
         </div>
       </div>
@@ -135,8 +148,9 @@ export default function GrrowQuiz() {
 
   return (
     <div className="max-w-xl mx-auto p-6">
-      <div className="mb-3">
-        <span className="inline-block text-xs tracking-wide rounded-full bg-gray-100 px-3 py-1">{data.circle}</span>
+      {/* Header: CIRCLE › STRENGTH */}
+      <div className="mb-3 text-xs text-gray-600 font-medium tracking-wide">
+        {data.circle} <span aria-hidden>›</span> {block.strength.toUpperCase()}
       </div>
 
       {qIndex === 0 ? (
@@ -168,16 +182,11 @@ export default function GrrowQuiz() {
             <div className="flex justify-between text-xs text-gray-500 mt-1">
               {ANCHORS.map((a) => <span key={a}>{a}</span>)}
             </div>
-            <div className="mt-2 text-sm text-gray-600">Score: <b>{answers[question!.id] ?? 0}</b></div>
           </div>
 
           <div className="mt-6 flex justify-between">
             <button onClick={back} className="px-4 py-2 rounded-xl border">Back</button>
             <button onClick={next} className="px-4 py-2 rounded-xl bg-black text-white">Next</button>
-          </div>
-
-          <div className="mt-4 text-xs text-gray-500">
-            {block.strength} — question {qIndex} of 3
           </div>
         </div>
       )}
