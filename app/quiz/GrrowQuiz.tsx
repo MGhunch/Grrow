@@ -131,7 +131,7 @@ export default function GrrowQuiz() {
 
       {qIndex === 0 ? (
         <>
-          <h2 className="grrow-skillset-title">Skillset: {block.skillset}</h2>
+          <h2 className="grrow-skillset-title"> {block.skillset}</h2>
           <p className="grrow-question-sub text-gray-700">{block.objective}</p>
 
           <div className="grrow-actions">
@@ -140,7 +140,7 @@ export default function GrrowQuiz() {
         </>
       ) : (
         <>
-          <h2 className="grrow-skillset-title">Skillset: {block.skillset}</h2>
+          <h2 className="grrow-skillset-title"> {block.skillset}</h2>
           <p className="grrow-question-sub">{question!.text}</p>
 
           {/* Slider block with extra vertical padding */}
