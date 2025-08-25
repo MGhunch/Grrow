@@ -1,103 +1,60 @@
-// app/quiz/GrrowQuiz.tsx
-"use client";
+import React, { useState } from "react";
 
-import { useEffect, useMemo, useState } from "react";
-
-type Question = { id: string; text: string; questionOrder: 1 | 2 | 3 };
-type StrengthBlock = {
-  strength: "Critical Thinking" | "Creativity" | "Collaboration" | "Communication";
-  strengthOrder: number;
-  skillset: string;
-  objective: string;
-  questions: Question[];
+// === Dummy data shape ===
+// Replace with Airtable fetch
+const QUIZ = {
+  ESSENTIALS: {
+    circle: "ESSENTIALS",
+    strengths: [
+      { skillset: "Clarify", objective: "Clarify meaning by restating and checking understanding.", questions: [{ id: "q1" }] },
+      { skillset: "Question", objective: "Use open questions to explore ideas and reasons.", questions: [{ id: "q2" }] },
+      { skillset: "Engage", objective: "Invite others in and build on contributions.", questions: [{ id: "q3" }] },
+      { skillset: "Connect", objective: "Link ideas across peers, texts, and experiences.", questions: [{ id: "q4" }] },
+    ],
+  },
 };
 
-type QuizData = {
-  circle: "ESSENTIALS" | "EXPLORING" | "SUPPORTING" | "LEADING";
-  version: string;
-  strengths: StrengthBlock[];
-};
+const CIRCLES = Object.keys(QUIZ);
 
-type AnswerMap = Record<string, number>;
-
-const ANCHORS = ["Not yet", "Sometimes", "Mostly", "Consistently"];
-const CIRCLES: QuizData["circle"][] = ["ESSENTIALS", "EXPLORING", "SUPPORTING", "LEADING"];
-
-function bucketColor(score: number) {
-  if (score >= 75) return "text-[#5F259F]";
-  if (score >= 50) return "text-[#3AAA89]";
-  if (score >= 25) return "text-[#3AAA89]/50";
-  return "text-gray-300";
-}
-
+// === Helpers ===
 function bucketLabel(score: number) {
   if (score >= 75) return "Nailing it";
-  if (score >= 50) return "Growing";
-  if (score >= 25) return "Learning";
+  if (score >= 50) return "Getting there";
+  if (score >= 25) return "Growing";
   return "Not yet";
 }
 
+function strengthTagClass(score: number) {
+  if (score >= 75) return "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200";
+  if (score >= 50) return "bg-blue-50 text-blue-700 ring-1 ring-blue-200";
+  if (score >= 25) return "bg-amber-50 text-amber-700 ring-1 ring-amber-200";
+  return "bg-gray-100 text-gray-700 ring-1 ring-gray-200";
+}
+
+// === Main component ===
 export default function GrrowQuiz() {
-  const [circle, setCircle] = useState<QuizData["circle"]>("ESSENTIALS");
-  const [loading, setLoading] = useState(false);
-  const [data, setData] = useState<QuizData | null>(null);
-  const [answers, setAnswers] = useState<AnswerMap>({});
-  const [step, setStep] = useState<{ s: number; q: number } | null>(null);
+  const [circle, setCircle] = useState("ESSENTIALS");
+  const [step, setStep] = useState(0);
+  const [answers, setAnswers] = useState<Record<string, number>>({});
 
-  useEffect(() => {
-    const fetcher = async () => {
-      setLoading(true);
-      const res = await fetch(`/api/questions?circle=${circle}&version=v1.0`, { cache: "no-store" });
-      const payload = (await res.json()) as QuizData;
-      setData(payload);
-      setAnswers({});
-      setStep({ s: 0, q: 0 });
-      setLoading(false);
-      if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
-    };
-    fetcher();
-  }, [circle]);
+  const data = QUIZ[circle];
 
-  const current = useMemo(() => {
-    if (!data || !step) return null;
-    const block = data.strengths[step.s];
-    return { block, qIndex: step.q };
-  }, [data, step]);
-
-  const circleAvg = useMemo(() => {
-    const vals = Object.values(answers);
-    if (!vals.length) return 0;
-    return Math.round(vals.reduce((a, b) => a + b, 0) / vals.length);
-  }, [answers]);
-
-  function setAnswer(id: string, val: number) {
-    setAnswers((prev) => ({ ...prev, [id]: val }));
-  }
-
-  function next() {
-    if (!data || !step) return;
-    const { s, q } = step;
-    if (q === 0) return setStep({ s, q: 1 });
-    if (q < 3) return setStep({ s, q: (q + 1) as 1 | 2 | 3 });
-    if (s < data.strengths.length - 1) return setStep({ s: s + 1, q: 0 });
-    setStep(null);
-  }
-
-  function back() {
-    if (!data || !step) return;
-    const { s, q } = step;
-    if (q > 0) return setStep({ s, q: (q - 1) as 0 | 1 | 2 });
-    if (s > 0) return setStep({ s: s - 1, q: 3 });
-  }
+  const allAnswers = Object.values(answers).filter((n) => typeof n === "number");
+  const circleAvg = allAnswers.length
+    ? Math.round(allAnswers.reduce((a, c) => a + c, 0) / allAnswers.length)
+    : 0;
 
   function nextCircle() {
     const idx = CIRCLES.indexOf(circle);
-    const next = CIRCLES[(idx + 1) % CIRCLES.length];
-    setCircle(next);
-  }
-
-  if (loading || !data) {
-    return <div className="p-6 text-gray-500">Loading…</div>;
+    const next = CIRCLES[idx + 1];
+    if (next) {
+      setCircle(next);
+      setStep(0);
+    } else {
+      setCircle(CIRCLES[0]);
+      setStep(0);
+      setAnswers({});
+    }
   }
 
   // === Summary screen ===
@@ -106,7 +63,7 @@ export default function GrrowQuiz() {
       const ids = b.questions.map((q) => q.id);
       const nums = ids.map((id) => answers[id]).filter((n) => typeof n === "number");
       const avg = nums.length ? Math.round(nums.reduce((a, c) => a + c, 0) / nums.length) : 0;
-      return { skillset: b.skillset, avg };
+      return { skillset: b.skillset, objective: b.objective, avg };
     });
 
     const idx = CIRCLES.indexOf(circle);
@@ -115,33 +72,56 @@ export default function GrrowQuiz() {
     return (
       <div className="grrow-wrap">
         <div className="grrow-stage">
-          {/* heading now shows just the circle */}
           <h1 className="grrow-summary-title">{data.circle}</h1>
           <p className="text-gray-600 mb-6">Great work. Here’s your snapshot for this circle.</p>
 
           <ul className="space-y-3">
-            {blocks.map(({ skillset, avg }) => (
-              <li
-                key={skillset}
-                className="flex items-center justify-between rounded-xl border p-4 bg-white shadow-sm"
-              >
-                <span className="font-medium">{skillset}</span>
-                <span
-                  className={`px-3 py-1 text-sm font-semibold rounded-full ${bucketColor(avg)}`}
-                  style={{ background: "#f9fafb", border: "1px solid #e5e7eb" }}
-                >
-                  {avg} · {bucketLabel(avg)}
-                </span>
+            {blocks.map(({ skillset, objective, avg }) => (
+              <li key={skillset} className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <div className="text-base font-medium text-gray-900">{skillset}</div>
+                    {objective && (
+                      <div className="mt-1 text-sm text-gray-600">{objective}</div>
+                    )}
+                  </div>
+
+                  <span
+                    className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-sm font-semibold ${strengthTagClass(avg)}`}
+                    aria-label={`Score ${avg}. ${bucketLabel(avg)}`}
+                  >
+                    <span className="tabular-nums">{avg}</span>
+                    <span>· {bucketLabel(avg)}</span>
+                  </span>
+                </div>
+
+                {/* Progress line */}
+                <div className="mt-3" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={avg}>
+                  <div className="h-2 w-full rounded-full bg-gray-100 overflow-hidden">
+                    <div
+                      className="h-full rounded-full"
+                      style={{
+                        width: `${Math.max(0, Math.min(100, avg))}%`,
+                        background: "linear-gradient(90deg,#7c3aed,#22c55e)",
+                      }}
+                    />
+                  </div>
+                </div>
               </li>
             ))}
           </ul>
 
           <div className="mt-6 flex items-center justify-between">
-            <div className="text-sm text-gray-500">
-              Circle average: <b>{circleAvg}</b> ({bucketLabel(circleAvg)})
+            <div className="text-sm text-gray-600">
+              Circle average: <b className="tabular-nums">{circleAvg}</b> ({bucketLabel(circleAvg)})
             </div>
             <div className="flex gap-2">
-              <button className="btn btn-outline" onClick={() => setCircle("ESSENTIALS")}>Redo</button>
+              <button
+                className="btn btn-outline"
+                onClick={() => setCircle("ESSENTIALS")}
+              >
+                Redo
+              </button>
               <button className="btn btn-primary" onClick={nextCircle}>
                 {isLast ? "Finish & Restart" : "Next circle"}
               </button>
@@ -152,72 +132,13 @@ export default function GrrowQuiz() {
     );
   }
 
-  // === Question / intro screens ===
-  const { block, qIndex } = current!;
-  const question = qIndex ? block.questions[qIndex - 1] : null;
-
-  const linearIndex = qIndex === 0 ? 0 : step!.s * 3 + (qIndex - 1) + 1;
-  const total = data.strengths.length * 3;
-  const percent = (linearIndex / total) * 100;
-
+  // === Question screen (placeholder) ===
   return (
     <div className="grrow-wrap">
       <div className="grrow-stage">
-        {/* Top progress */}
-        <div className="grrow-progress">
-          <div className="bar" style={{ width: `${percent}%` }} />
-        </div>
-
-        {/* Breadcrumb */}
-        <div className="grrow-breadcrumb">
-          <span className="circle">{data.circle}</span>
-          <span className="sep">›</span>
-          <span className="strength">{block.strength.toUpperCase()}</span>
-        </div>
-
-        {qIndex === 0 ? (
-          <>
-            <h2 className="grrow-skillset-title">{block.skillset}</h2>
-            <p className="mt-3 text-gray-600">{block.objective}</p>
-
-            <div className="grrow-actions">
-              <button onClick={next} className="btn btn-green">Start questions</button>
-            </div>
-          </>
-        ) : (
-          <>
-            <h2 className="grrow-skillset-title">{block.skillset}</h2>
-            <p className="grrow-question-sub">{question!.text}</p>
-
-            <div className="grrow-slider-block">
-              <input
-                type="range"
-                min={0}
-                max={100}
-                step={1}
-                value={answers[question!.id] ?? 0}
-                onChange={(e) => setAnswer(question!.id, Number(e.target.value))}
-                className="grrow-range"
-              />
-              <div className="grrow-scale">
-                {ANCHORS.map((a) => <span key={a}>{a}</span>)}
-              </div>
-            </div>
-
-            <div className="grrow-actions">
-              <button className="tooltip-btn">?</button>
-              <div className="right">
-                <button onClick={back} className="btn btn-outline">Back</button>
-                <button onClick={next} className="btn btn-green">Next</button>
-              </div>
-            </div>
-          </>
-        )}
-
-        {/* Bottom progress */}
-        <div className="grrow-progress">
-          <div className="bar" style={{ width: `${percent}%` }} />
-        </div>
+        <h1>{data.circle} Question {step}</h1>
+        {/* Put your question UI here */}
+        <button onClick={() => setStep(0)}>Finish Circle</button>
       </div>
     </div>
   );
