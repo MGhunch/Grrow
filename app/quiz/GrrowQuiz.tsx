@@ -115,27 +115,68 @@ export default function GrrowQuiz() {
     const isLast = idx === CIRCLES.length - 1;
 
     return (
-      <div className="grrow-wrap">
-        {/* Summary heading now uses Playfair via .grrow-summary-title */}
-        <h1 className="grrow-summary-title">{data.circle} — Summary</h1>
-        <p className="text-gray-600 mb-6">Great work. Here’s your snapshot for this circle.</p>
+  <div className="grrow-wrap">
+    <div className="grrow-stage">
+      {/* Top progress */}
+      <div className="grrow-progress">
+        <div className="bar" style={{ width: `${percent}%` }} />
+      </div>
 
-        <ul className="space-y-3">
-          {blocks.map(({ skillset, avg }) => (
-            <li
-              key={skillset}
-              className="flex items-center justify-between rounded-xl border p-4 bg-white shadow-sm"
-            >
-              <span className="font-medium">{skillset}</span>
-              <span
-                className={`px-3 py-1 text-sm font-semibold rounded-full ${bucketColor(avg)}`}
-                style={{ background: "#f9fafb", border: "1px solid #e5e7eb" }}
-              >
-                {avg} · {bucketLabel(avg)}
-              </span>
-            </li>
-          ))}
-        </ul>
+      {/* Breadcrumb */}
+      <div className="grrow-breadcrumb">
+        <span className="circle">{data.circle}</span>
+        <span className="sep">›</span>
+        <span className="strength">{block.strength.toUpperCase()}</span>
+      </div>
+
+      {qIndex === 0 ? (
+        <>
+          <h2 className="grrow-skillset-title">Skillset: {block.skillset}</h2>
+          <p className="grrow-question-sub text-gray-700">{block.objective}</p>
+
+          <div className="grrow-actions">
+            <button onClick={next} className="btn btn-green">Start questions</button>
+          </div>
+        </>
+      ) : (
+        <>
+          <h2 className="grrow-skillset-title">Skillset: {block.skillset}</h2>
+          <p className="grrow-question-sub">{question!.text}</p>
+
+          {/* Slider block with extra vertical padding */}
+          <div className="grrow-slider-block">
+            <input
+              type="range"
+              min={0}
+              max={100}
+              step={1}
+              value={answers[question!.id] ?? 0}
+              onChange={(e) => setAnswer(question!.id, Number(e.target.value))}
+              className="grrow-range"
+            />
+            <div className="grrow-scale">
+              {ANCHORS.map((a) => <span key={a}>{a}</span>)}
+            </div>
+          </div>
+
+          <div className="grrow-actions">
+            <button className="tooltip-btn">?</button>
+            <div className="right">
+              <button onClick={back} className="btn btn-outline">Back</button>
+              <button onClick={next} className="btn btn-green">Next</button>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Bottom progress */}
+      <div className="grrow-progress">
+        <div className="bar" style={{ width: `${percent}%` }} />
+      </div>
+    </div>
+  </div>
+);
+
 
         <div className="mt-6 flex items-center justify-between">
           <div className="text-sm text-gray-500">
