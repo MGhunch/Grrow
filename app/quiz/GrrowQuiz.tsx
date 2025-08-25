@@ -1,3 +1,4 @@
+// app/quiz/GrrowQuiz.tsx
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
@@ -23,10 +24,10 @@ const ANCHORS = ["Not yet", "Sometimes", "Mostly", "Consistently"];
 const CIRCLES: QuizData["circle"][] = ["ESSENTIALS", "EXPLORING", "SUPPORTING", "LEADING"];
 
 function bucketColor(score: number) {
-  if (score >= 75) return "text-[#5F259F]";
-  if (score >= 50) return "text-[#3AAA89]";
-  if (score >= 25) return "text-[#3AAA89]/50";
-  return "text-gray-300";
+  if (score >= 75) return "text-[#5F259F]";      // Purple = Nailing
+  if (score >= 50) return "text-[#3AAA89]";      // Green = Growing
+  if (score >= 25) return "text-[#3AAA89]/50";   // Light Green = Learning
+  return "text-gray-300";                         // Not yet
 }
 
 function bucketLabel(score: number) {
@@ -41,7 +42,7 @@ export default function GrrowQuiz() {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<QuizData | null>(null);
   const [answers, setAnswers] = useState<AnswerMap>({});
-  const [step, setStep] = useState<{ s: number; q: number } | null>(null);
+  const [step, setStep] = useState<{ s: number; q: number } | null>(null); // s=strength idx, q=0=intro or 1..3
 
   // fetch circle data
   useEffect(() => {
@@ -51,7 +52,7 @@ export default function GrrowQuiz() {
       const payload = (await res.json()) as QuizData;
       setData(payload);
       setAnswers({});
-      setStep({ s: 0, q: 0 });
+      setStep({ s: 0, q: 0 }); // start at first strength intro
       setLoading(false);
       if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
     };
@@ -61,7 +62,7 @@ export default function GrrowQuiz() {
   const current = useMemo(() => {
     if (!data || !step) return null;
     const block = data.strengths[step.s];
-    return { block, qIndex: step.q };
+    return { block, qIndex: step.q }; // qIndex: 0=intro, 1..3=question idx
   }, [data, step]);
 
   const circleAvg = useMemo(() => {
@@ -80,6 +81,7 @@ export default function GrrowQuiz() {
     if (q === 0) return setStep({ s, q: 1 });
     if (q < 3) return setStep({ s, q: (q + 1) as 1 | 2 | 3 });
     if (s < data.strengths.length - 1) return setStep({ s: s + 1, q: 0 });
+    // end of circle
     setStep(null);
   }
 
@@ -100,7 +102,7 @@ export default function GrrowQuiz() {
     return <div className="p-6 text-gray-500">Loading…</div>;
   }
 
-  // Circle summary
+  // Circle summary when step is null
   if (!step) {
     const blocks = data.strengths.map((b) => {
       const ids = b.questions.map((q) => q.id);
@@ -114,14 +116,23 @@ export default function GrrowQuiz() {
 
     return (
       <div className="grrow-wrap">
-        <h1 className="text-2xl font-semibold mb-2">{data.circle} — Summary</h1>
+        {/* Summary heading now uses Playfair via .grrow-summary-title */}
+        <h1 className="grrow-summary-title">{data.circle} — Summary</h1>
         <p className="text-gray-600 mb-6">Great work. Here’s your snapshot for this circle.</p>
 
         <ul className="space-y-3">
           {blocks.map(({ skillset, avg }) => (
-            <li key={skillset} className="flex items-center justify-between rounded-xl border p-4">
+            <li
+              key={skillset}
+              className="flex items-center justify-between rounded-xl border p-4 bg-white shadow-sm"
+            >
               <span className="font-medium">{skillset}</span>
-              <span className={`font-semibold ${bucketColor(avg)}`}>{avg} · {bucketLabel(avg)}</span>
+              <span
+                className={`px-3 py-1 text-sm font-semibold rounded-full ${bucketColor(avg)}`}
+                style={{ background: "#f9fafb", border: "1px solid #e5e7eb" }}
+              >
+                {avg} · {bucketLabel(avg)}
+              </span>
             </li>
           ))}
         </ul>
@@ -141,7 +152,7 @@ export default function GrrowQuiz() {
     );
   }
 
-  // Question flow
+  // Render either intro card (qIndex=0) or question card (1..3)
   const { block, qIndex } = current!;
   const question = qIndex ? block.questions[qIndex - 1] : null;
 
@@ -152,68 +163,69 @@ export default function GrrowQuiz() {
 
   return (
     <div className="grrow-wrap">
-      {/* Top progress */}
-      <div className="grrow-progress mb-4">
-        <div className="bar" style={{ width: `${percent}%` }} />
-      </div>
-
-      {/* Breadcrumb */}
-      <div className="grrow-breadcrumb">
-        <span className="circle">{data.circle}</span>
-        <span className="sep">›</span>
-        <span className="strength">{block.strength.toUpperCase()}</span>
-      </div>
-
-      {qIndex === 0 ? (
-        // Skillset intro
-        <div className="card card-lg">
-          <div className="inner">
-            <h2 className="grrow-skillset-title">Skillset: {block.skillset}</h2>
-            <p className="mt-2 text-gray-600">{block.objective}</p>
-            <button onClick={next} className="btn btn-primary mt-6">
-              Start questions
-            </button>
-          </div>
+      <div className="grrow-stage">
+        {/* Top progress */}
+        <div className="grrow-progress">
+          <div className="bar" style={{ width: `${percent}%` }} />
         </div>
-      ) : (
-        // Question card
-        <div className="card card-lg">
-          <div className="inner">
-            <h2 className="grrow-skillset-title">Skillset: {block.skillset}</h2>
-            <p className="grrow-question-sub">{question!.text}</p>
 
-            {/* Slider */}
-            <div className="mt-6">
-              <input
-                type="range"
-                min={0}
-                max={100}
-                step={1}
-                value={answers[question!.id] ?? 0}
-                onChange={(e) => setAnswer(question!.id, Number(e.target.value))}
-                className="grrow-range"
-              />
-              <div className="grrow-scale">
-                {ANCHORS.map((a) => <span key={a}>{a}</span>)}
-              </div>
-            </div>
+        {/* Breadcrumb */}
+        <div className="grrow-breadcrumb">
+          <span className="circle">{data.circle}</span>
+          <span className="sep">›</span>
+          <span className="strength">{block.strength.toUpperCase()}</span>
+        </div>
 
-            {/* Actions */}
-            <div className="grrow-actions">
-              <button className="tooltip-btn">?</button>
-              <div className="right">
-                <button onClick={back} className="btn btn-outline">Back</button>
-                <button onClick={next} className="btn btn-green">Next</button>
-              </div>
+        {qIndex === 0 ? (
+          // Skillset intro
+          <div className="card card-lg">
+            <div className="inner">
+              <h2 className="grrow-skillset-title">Skillset: {block.skillset}</h2>
+              <p className="mt-3 text-gray-600">{block.objective}</p>
+              <button onClick={next} className="btn btn-primary mt-6">Start questions</button>
             </div>
           </div>
-        </div>
-      )}
+        ) : (
+          // Question card
+          <div className="card card-lg">
+            <div className="inner">
+              <h2 className="grrow-skillset-title">Skillset: {block.skillset}</h2>
+              <p className="grrow-question-sub">{question!.text}</p>
 
-      {/* Bottom progress */}
-      <div className="grrow-progress mt-6">
-        <div className="bar" style={{ width: `${percent}%` }} />
+              {/* Slider */}
+              <div className="mt-6">
+                <input
+                  type="range"
+                  min={0}
+                  max={100}
+                  step={1}
+                  value={answers[question!.id] ?? 0}
+                  onChange={(e) => setAnswer(question!.id, Number(e.target.value))}
+                  className="grrow-range"
+                />
+                <div className="grrow-scale">
+                  {ANCHORS.map((a) => <span key={a}>{a}</span>)}
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="grrow-actions">
+                <button className="tooltip-btn">?</button>
+                <div className="right">
+                  <button onClick={back} className="btn btn-outline">Back</button>
+                  <button onClick={next} className="btn btn-green">Next</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Bottom progress */}
+        <div className="grrow-progress">
+          <div className="bar" style={{ width: `${percent}%` }} />
+        </div>
       </div>
     </div>
   );
 }
+
