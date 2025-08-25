@@ -1,4 +1,8 @@
-import React, { useMemo, useState } from "react";
+'use client'
+
+import { useMemo, useState, useEffect } from 'react';
+
+
 
 /**
  * GrrowQuiz.tsx — single-file implementation matching the journey:
