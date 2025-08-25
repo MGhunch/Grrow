@@ -6,9 +6,9 @@ type Question = { id: string; text: string; questionOrder: 1 | 2 | 3 };
 type StrengthBlock = {
   strength: "Critical Thinking" | "Creativity" | "Collaboration" | "Communication";
   strengthOrder: number;
-  skillset: string;       // e.g., Clarify / Simplify / Solve / Innovate ...
-  objective: string;      // show once at start of block
-  questions: Question[];  // length = 3
+  skillset: string;
+  objective: string;
+  questions: Question[];
 };
 
 type QuizData = {
@@ -17,16 +17,16 @@ type QuizData = {
   strengths: StrengthBlock[];
 };
 
-type AnswerMap = Record<string, number>; // questionId -> 0..100
+type AnswerMap = Record<string, number>;
 
 const ANCHORS = ["Not yet", "Sometimes", "Mostly", "Consistently"];
 const CIRCLES: QuizData["circle"][] = ["ESSENTIALS", "EXPLORING", "SUPPORTING", "LEADING"];
 
 function bucketColor(score: number) {
-  if (score >= 75) return "text-[#5F259F]";      // Purple = Nailing
-  if (score >= 50) return "text-[#3AAA89]";      // Green = Growing
-  if (score >= 25) return "text-[#3AAA89]/50";   // Light Green = Learning
-  return "text-gray-300";                         // Not yet
+  if (score >= 75) return "text-[#5F259F]";
+  if (score >= 50) return "text-[#3AAA89]";
+  if (score >= 25) return "text-[#3AAA89]/50";
+  return "text-gray-300";
 }
 
 function bucketLabel(score: number) {
@@ -41,7 +41,7 @@ export default function GrrowQuiz() {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<QuizData | null>(null);
   const [answers, setAnswers] = useState<AnswerMap>({});
-  const [step, setStep] = useState<{ s: number; q: number } | null>(null); // s=strength idx, q=0=intro or 1..3
+  const [step, setStep] = useState<{ s: number; q: number } | null>(null);
 
   // fetch circle data
   useEffect(() => {
@@ -51,9 +51,8 @@ export default function GrrowQuiz() {
       const payload = (await res.json()) as QuizData;
       setData(payload);
       setAnswers({});
-      setStep({ s: 0, q: 0 }); // start at first strength intro
+      setStep({ s: 0, q: 0 });
       setLoading(false);
-      // scroll to top on circle change
       if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
     };
     fetcher();
@@ -62,7 +61,7 @@ export default function GrrowQuiz() {
   const current = useMemo(() => {
     if (!data || !step) return null;
     const block = data.strengths[step.s];
-    return { block, qIndex: step.q }; // qIndex: 0=intro, 1..3=question idx
+    return { block, qIndex: step.q };
   }, [data, step]);
 
   const circleAvg = useMemo(() => {
@@ -78,11 +77,9 @@ export default function GrrowQuiz() {
   function next() {
     if (!data || !step) return;
     const { s, q } = step;
-    // 0=intro → go to first question; 1..2 → next; 3 → next strength intro or finish
     if (q === 0) return setStep({ s, q: 1 });
     if (q < 3) return setStep({ s, q: (q + 1) as 1 | 2 | 3 });
     if (s < data.strengths.length - 1) return setStep({ s: s + 1, q: 0 });
-    // end of circle
     setStep(null);
   }
 
@@ -103,7 +100,7 @@ export default function GrrowQuiz() {
     return <div className="p-6 text-gray-500">Loading…</div>;
   }
 
-  // Circle summary when step is null
+  // Circle summary
   if (!step) {
     const blocks = data.strengths.map((b) => {
       const ids = b.questions.map((q) => q.id);
@@ -116,7 +113,7 @@ export default function GrrowQuiz() {
     const isLast = idx === CIRCLES.length - 1;
 
     return (
-      <div className="max-w-2xl mx-auto p-6">
+      <div className="grrow-wrap">
         <h1 className="text-2xl font-semibold mb-2">{data.circle} — Summary</h1>
         <p className="text-gray-600 mb-6">Great work. Here’s your snapshot for this circle.</p>
 
@@ -130,10 +127,12 @@ export default function GrrowQuiz() {
         </ul>
 
         <div className="mt-6 flex items-center justify-between">
-          <div className="text-sm text-gray-500">Circle average: <b>{circleAvg}</b> ({bucketLabel(circleAvg)})</div>
+          <div className="text-sm text-gray-500">
+            Circle average: <b>{circleAvg}</b> ({bucketLabel(circleAvg)})
+          </div>
           <div className="flex gap-2">
-            <button className="px-4 py-2 rounded-xl border" onClick={() => setCircle("ESSENTIALS")}>Redo</button>
-            <button className="px-4 py-2 rounded-xl bg-black text-white" onClick={nextCircle}>
+            <button className="btn btn-outline" onClick={() => setCircle("ESSENTIALS")}>Redo</button>
+            <button className="btn btn-primary" onClick={nextCircle}>
               {isLast ? "Finish & Restart" : "Next circle"}
             </button>
           </div>
@@ -142,54 +141,79 @@ export default function GrrowQuiz() {
     );
   }
 
-  // Render either intro card (qIndex=0) or question card (1..3)
+  // Question flow
   const { block, qIndex } = current!;
   const question = qIndex ? block.questions[qIndex - 1] : null;
 
+  // Linear progress (12 questions per circle)
+  const linearIndex = qIndex === 0 ? 0 : step!.s * 3 + (qIndex - 1) + 1;
+  const total = data.strengths.length * 3; // 12
+  const percent = (linearIndex / total) * 100;
+
   return (
-    <div className="max-w-xl mx-auto p-6">
-      {/* Header: CIRCLE › STRENGTH */}
-      <div className="mb-3 text-xs text-gray-600 font-medium tracking-wide">
-        {data.circle} <span aria-hidden>›</span> {block.strength.toUpperCase()}
+    <div className="grrow-wrap">
+      {/* Top progress */}
+      <div className="grrow-progress mb-4">
+        <div className="bar" style={{ width: `${percent}%` }} />
+      </div>
+
+      {/* Breadcrumb */}
+      <div className="grrow-breadcrumb">
+        <span className="circle">{data.circle}</span>
+        <span className="sep">›</span>
+        <span className="strength">{block.strength.toUpperCase()}</span>
       </div>
 
       {qIndex === 0 ? (
         // Skillset intro
-        <div className="rounded-2xl border p-6 shadow-sm">
-          <h2 className="text-xl font-semibold">{block.skillset}</h2>
-          <p className="mt-2 text-gray-600">{block.objective}</p>
-          <button onClick={next} className="mt-5 px-4 py-2 rounded-xl bg-[#5F259F] text-white">
-            Start questions
-          </button>
+        <div className="card card-lg">
+          <div className="inner">
+            <h2 className="grrow-skillset-title">Skillset: {block.skillset}</h2>
+            <p className="mt-2 text-gray-600">{block.objective}</p>
+            <button onClick={next} className="btn btn-primary mt-6">
+              Start questions
+            </button>
+          </div>
         </div>
       ) : (
         // Question card
-        <div className="rounded-2xl border p-6 shadow-sm">
-          <h2 className="text-xl font-semibold">{block.skillset}</h2>
-          <p className="mt-2 text-gray-800">{question!.text}</p>
+        <div className="card card-lg">
+          <div className="inner">
+            <h2 className="grrow-skillset-title">Skillset: {block.skillset}</h2>
+            <p className="grrow-question-sub">{question!.text}</p>
 
-          {/* Slider */}
-          <div className="mt-5">
-            <input
-              type="range"
-              min={0}
-              max={100}
-              step={1}
-              value={answers[question!.id] ?? 0}
-              onChange={(e) => setAnswer(question!.id, Number(e.target.value))}
-              className="w-full"
-            />
-            <div className="flex justify-between text-xs text-gray-500 mt-1">
-              {ANCHORS.map((a) => <span key={a}>{a}</span>)}
+            {/* Slider */}
+            <div className="mt-6">
+              <input
+                type="range"
+                min={0}
+                max={100}
+                step={1}
+                value={answers[question!.id] ?? 0}
+                onChange={(e) => setAnswer(question!.id, Number(e.target.value))}
+                className="grrow-range"
+              />
+              <div className="grrow-scale">
+                {ANCHORS.map((a) => <span key={a}>{a}</span>)}
+              </div>
             </div>
-          </div>
 
-          <div className="mt-6 flex justify-between">
-            <button onClick={back} className="px-4 py-2 rounded-xl border">Back</button>
-            <button onClick={next} className="px-4 py-2 rounded-xl bg-black text-white">Next</button>
+            {/* Actions */}
+            <div className="grrow-actions">
+              <button className="tooltip-btn">?</button>
+              <div className="right">
+                <button onClick={back} className="btn btn-outline">Back</button>
+                <button onClick={next} className="btn btn-green">Next</button>
+              </div>
+            </div>
           </div>
         </div>
       )}
+
+      {/* Bottom progress */}
+      <div className="grrow-progress mt-6">
+        <div className="bar" style={{ width: `${percent}%` }} />
+      </div>
     </div>
   );
 }
