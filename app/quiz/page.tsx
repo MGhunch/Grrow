@@ -1,9 +1,6 @@
 // app/quiz/page.tsx
+import GrrowQuiz from "./GrrowQuiz";
+
 export default function QuizPage() {
-  return (
-    <main style={{ padding: 24 }}>
-      <h1>✅ /quiz shell is alive</h1>
-      <p>If you can see this, the crash is inside GrrowQuiz.tsx or something it imports.</p>
-    </main>
-  );
+  return <GrrowQuiz />;
 }
