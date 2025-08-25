@@ -1,91 +1,152 @@
-import { NextResponse } from "next/server";
+// app/api/questions/route.ts
+// Next.js App Router API that reads Airtable and returns QuizData for your GrrowQuiz.tsx
 
-/**
- * Minimal server route:
- * - Reads query: circle (ESSENTIALS|EXPLORING|SUPPORTING|LEADING), version (default v1.0)
- * - Fetches Airtable (replace with your base + API key)
- * - Groups/sorts: CircleOrder → StrengthOrder → QuestionOrder
- * - Returns QuizCirclePayload
- */
+import { NextRequest } from "next/server";
 
-const AIRTABLE_BASE = process.env.AIRTABLE_BASE_ID!;
-const AIRTABLE_TABLE = process.env.AIRTABLE_TABLE_NAME || "Questions";
-const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY!;
-const AIRTABLE_URL = `https://api.airtable.com/v0/${AIRTABLE_BASE}/${encodeURIComponent(AIRTABLE_TABLE)}`;
+export const runtime = "nodejs"; // we call Airtable REST from the server
 
-type Row = {
-  id: string;
-  fields: {
-    ID: string;
-    Circle: "ESSENTIALS" | "EXPLORING" | "SUPPORTING" | "LEADING";
-    Strength: "Critical thinking" | "Creativity" | "Collaboration" | "Communication";
-    Skillset: string;
-    Objective?: string; // a.k.a. Goal
-    Question: string;
-    CircleOrder: number;
-    StrengthOrder: number;
-    QuestionOrder: number;
-    Active?: boolean;
-    Version?: string;
-  };
+type Question = { id: string; text: string; questionOrder: 1 | 2 | 3 };
+type StrengthBlock = {
+  strength: "Critical thinking" | "Creativity" | "Collaboration" | "Communication";
+  strengthOrder: number;
+  skillset: string;
+  objective: string;
+  questions: Question[]; // len = 3
 };
 
-export async function GET(req: Request) {
-  const { searchParams } = new URL(req.url);
-  const circle = (searchParams.get("circle") || "ESSENTIALS").toUpperCase();
-  const version = searchParams.get("version") || "v1.0";
+type QuizData = {
+  circle: "ESSENTIALS" | "EXPLORING" | "SUPPORTING" | "LEADING";
+  version: string;
+  strengths: StrengthBlock[];
+};
 
-  // Airtable filter: only Active, correct Circle + Version
-  const filterByFormula = encodeURIComponent(
-    `AND({Active}=TRUE(), {Circle}='${circle}', {Version}='${version}')`
-  );
+const STRENGTH_ORDER: Record<string, number> = {
+  "Critical Thinking": 1,
+  "Creativity": 2,
+  "Collaboration": 3,
+  "Communication": 4,
+};
 
-  // We fetch all rows for this circle/version
-  const res = await fetch(`${AIRTABLE_URL}?filterByFormula=${filterByFormula}&pageSize=200`, {
-    headers: { Authorization: `Bearer ${AIRTABLE_API_KEY}` },
-    // cache: "no-store"  // uncomment if you want fresh data every time
-  });
-
-  if (!res.ok) {
-    return NextResponse.json({ error: "Failed to fetch Airtable" }, { status: 500 });
+export async function GET(req: NextRequest) {
+  const { AIRTABLE_API_KEY, AIRTABLE_BASE_ID, AIRTABLE_TABLE_NAME } = process.env;
+  if (!AIRTABLE_API_KEY || !AIRTABLE_BASE_ID || !AIRTABLE_TABLE_NAME) {
+    return Response.json(
+      { ok: false, error: "Missing AIRTABLE_API_KEY, AIRTABLE_BASE_ID or AIRTABLE_TABLE_NAME" },
+      { status: 500 }
+    );
   }
 
-  const data = (await res.json()) as { records: Row[] };
+  const url = new URL(req.url);
+  const circle =
+    (url.searchParams.get("circle") as QuizData["circle"]) || "ESSENTIALS";
+  const version = url.searchParams.get("version") || "v1.0";
 
-  // group by Strength → then sort by QuestionOrder
-  const byStrength = new Map<string, Row[]>();
-  for (const r of data.records) {
-    const k = r.fields.Strength;
-    if (!byStrength.has(k)) byStrength.set(k, []);
-    byStrength.get(k)!.push(r);
+  try {
+    // 1) Pull all matching rows from Airtable (handles pagination)
+    const records = await fetchAllFromAirtable({
+      apiKey: AIRTABLE_API_KEY,
+      baseId: AIRTABLE_BASE_ID,
+      table: AIRTABLE_TABLE_NAME,
+      filterByFormula: buildFormula({ circle, version }),
+    });
+
+    // 2) Map Airtable → QuizData
+    const blocksMap = new Map<string, StrengthBlock>();
+
+    for (const r of records) {
+      const f = r.fields as any;
+
+      const strength: string = f["Strength"];           // e.g. "Critical Thinking"
+      const skillset: string = f["Skillset"];            // e.g. "Clarify"
+      const objective: string = f["Goal"];               // objective text
+      const qText: string = f["Question"];
+      const qOrder: number = Number(f["Question Order"]); // 1..3
+      const id: string = f["ID"];                        // e.g. "CT-CLA-01"
+
+      if (!strength || !skillset || !qText || !qOrder || !id) continue;
+
+      const key = `${strength}::${skillset}`;
+      if (!blocksMap.has(key)) {
+        blocksMap.set(key, {
+          strength: (toTitle(strength) as StrengthBlock["strength"]),
+          strengthOrder: STRENGTH_ORDER[toTitle(strength)] ?? 999,
+          skillset,
+          objective,
+          questions: [],
+        });
+      }
+
+      const block = blocksMap.get(key)!;
+      block.questions.push({
+        id,
+        text: qText,
+        questionOrder: (qOrder as 1 | 2 | 3),
+      });
+    }
+
+    // 3) Sort questions inside each block and sort blocks by strength order
+    const strengths = Array.from(blocksMap.values())
+      .map((b) => ({
+        ...b,
+        questions: b.questions.sort((a, b) => a.questionOrder - b.questionOrder),
+      }))
+      .sort((a, b) => a.strengthOrder - b.strengthOrder);
+
+    const payload: QuizData = { circle, version, strengths };
+    return Response.json(payload);
+  } catch (e: any) {
+    return Response.json({ ok: false, error: String(e?.message || e) }, { status: 500 });
   }
+}
 
-  const strengths = Array.from(byStrength.entries())
-    .map(([strength, rows]) => {
-      // infer shared attributes from first row
-      const first = rows[0].fields;
-      // sort 1..3
-      rows.sort((a, b) => (a.fields.QuestionOrder ?? 999) - (b.fields.QuestionOrder ?? 999));
-      return {
-        strength,
-        strengthOrder: first.StrengthOrder ?? 999,
-        skillset: first.Skillset,
-        objective: first.Objective ?? "",
-        questions: rows.map((r) => ({
-          id: r.fields.ID || r.id,
-          text: r.fields.Question,
-          questionOrder: (r.fields.QuestionOrder as 1 | 2 | 3) ?? 3,
-        })),
-      };
-    })
-    // sort strengths within the circle
-    .sort((a, b) => a.strengthOrder - b.strengthOrder);
+// ---- helpers ----
 
-  const payload = {
-    circle,
-    version,
-    strengths,
-  };
+function toTitle(s: string): string {
+  // normalise "Critical thinking" vs "Critical Thinking"
+  return s?.replace(/\w\S*/g, (w) => w[0].toUpperCase() + w.slice(1).toLowerCase());
+}
 
-  return NextResponse.json(payload);
+function buildFormula({ circle, version }: { circle: string; version: string }) {
+  // Airtable formula: AND({Active}=TRUE(), {Circle}='ESSENTIALS', {Version}='v1.0')
+  const esc = (v: string) => `'${String(v).replace(/'/g, "\\'")}'`;
+  return `AND({Active}=TRUE(), {Circle}=${esc(circle)}, {Version}=${esc(version)})`;
+}
+
+async function fetchAllFromAirtable(opts: {
+  apiKey: string;
+  baseId: string;
+  table: string;
+  filterByFormula: string;
+}) {
+  const { apiKey, baseId, table, filterByFormula } = opts;
+  let url = new URL(`https://api.airtable.com/v0/${baseId}/${encodeURIComponent(table)}`);
+  url.searchParams.set("pageSize", "100");
+  url.searchParams.set("filterByFormula", filterByFormula);
+  // We can also sort by Circle Order then Question Order if you like:
+  // url.searchParams.set("sort[0][field]", "Circle Order");
+  // url.searchParams.set("sort[0][direction]", "asc");
+  // url.searchParams.set("sort[1][field]", "Question Order");
+  // url.searchParams.set("sort[1][direction]", "asc");
+
+  const all: any[] = [];
+  let offset: string | undefined;
+
+  do {
+    if (offset) {
+      url.searchParams.set("offset", offset);
+    }
+
+    const res = await fetch(url.toString(), {
+      headers: { Authorization: `Bearer ${apiKey}` },
+      cache: "no-store",
+    });
+    if (!res.ok) {
+      throw new Error(`Airtable error ${res.status}: ${await res.text()}`);
+    }
+    const json = await res.json();
+    all.push(...(json.records || []));
+    offset = json.offset;
+  } while (offset);
+
+  return all;
 }
