@@ -1,4 +1,4 @@
-'use client'
+e'use client'
 
 import { useEffect, useMemo, useState } from 'react';
 import Progress from './progress';
@@ -128,9 +128,10 @@ export default function GrrowQuiz() {
   const { block, qIndex } = current!;
   const question = qIndex ? block.questions[qIndex - 1] : null;
 
-  // 12-question progress within circle
-  const linearIndex = qIndex === 0 ? 0 : step!.s * 3 + (qIndex - 1) + 1;
-  const total = data.strengths.length * 3;
+  // show progress-so-far on intros, and the 1-based count on questions
+const answeredSoFar = step!.s * 3; // 0, 3, 6, 9...
+const linearIndex = qIndex === 0 ? answeredSoFar : answeredSoFar + (qIndex - 1) + 1;
+const total = data.strengths.length * 3;
 
   return (
     <div className="grrow-wrap">
