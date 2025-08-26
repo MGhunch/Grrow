@@ -199,7 +199,7 @@ export default function GrrowQuiz() {
           </>
         )}
 
-        <Progress current={linearIndex} total={total} />
+       <Progress current={linearIndex} total={total} className="mt-6" />
       </div>
     </div>
   );
