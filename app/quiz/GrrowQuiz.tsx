@@ -79,50 +79,68 @@ export default function GrrowQuiz() {
 
   if (loading || !data) return <div className="p-6 text-gray-500">Loading…</div>;
 
-  // Summary screen (per circle)
-  if (!step) {
-    const blocks = data.strengths.map((b) => {
-      const ids = b.questions.map((q) => q.id);
-      const nums = ids.map((id) => answers[id]).filter((n) => typeof n === "number");
-      const avg = nums.length ? Math.round(nums.reduce((a, c) => a + c, 0) / nums.length) : 0;
-      return { skillset: b.skillset, avg };
-    });
-    const idx = CIRCLES.indexOf(circle);
-    const isLast = idx === CIRCLES.length - 1;
+ // Summary screen (per circle)
+if (!step) {
+  const blocks = data.strengths.map((b) => {
+    const ids = b.questions.map((q) => q.id);
+    const nums = ids.map((id) => answers[id]).filter((n) => typeof n === "number");
+    const avg = nums.length ? Math.round(nums.reduce((a, c) => a + c, 0) / nums.length) : 0;
+    return { skillset: b.skillset, avg };
+  });
+  const idx = CIRCLES.indexOf(circle);
+  const isLast = idx === CIRCLES.length - 1;
 
-    return (
-      <div className="grrow-wrap">
-        <div className="grrow-stage">
-          <h1 className="grrow-summary-title">{data.circle}</h1>
-          <p className="text-gray-600 mb-6">Great work. Here’s your snapshot for this circle.</p>
+  return (
+    <div className="grrow-wrap">
+      <div className="grrow-stage">
+        {/* Circle name in Playfair */}
+        <h1 className="grrow-summary-title">{data.circle}</h1>
 
-          <ul className="space-y-3">
-            {blocks.map(({ skillset, avg }) => (
-              <li key={skillset} className="flex items-center justify-between rounded-xl border p-4 bg-white shadow-sm">
-                <span className="font-medium">{skillset}</span>
-                <span className={`px-3 py-1 text-sm font-semibold rounded-full ${bucketColor(avg)}`}
-                      style={{ background: "#f9fafb", border: "1px solid #e5e7eb" }}>
-                  {avg} · {bucketLabel(avg)}
-                </span>
-              </li>
-            ))}
-          </ul>
+        {/* Copy tweak */}
+        <p className="text-gray-600 mb-6">Here’s your snapshot for this circle.</p>
 
-          <div className="mt-6 flex items-center justify-between">
-            <div className="text-sm text-gray-500">
-              Circle average: <b>{circleAvg}</b> ({bucketLabel(circleAvg)})
-            </div>
-            <div className="flex gap-2">
-              <button className="btn btn-outline" onClick={() => setCircle("ESSENTIALS")}>Redo</button>
-              <button className="btn btn-primary" onClick={nextCircle}>
-                {isLast ? "Finish & Restart" : "Next circle"}
-              </button>
-            </div>
+        {/* Skill rows */}
+        <ul className="space-y-3">
+          {blocks.map(({ skillset, avg }) => (
+            <li
+              key={skillset}
+              className="flex items-center justify-between gap-3 rounded-xl border p-4 bg-white shadow-sm"
+            >
+              <span className="font-medium">{skillset}</span>
+
+              {/* Meter: purple = progress, green = to 100% */}
+              <div className="flex-1 max-w-[340px]">
+                <div className="grrow-meter" role="img" aria-label={`${skillset} progress`}>
+                  <span className="done" style={{ width: `${avg}%` }} />
+                  <span className="remaining" style={{ width: `${100 - avg}%` }} />
+                </div>
+              </div>
+
+              {/* Status label (no numbers) */}
+              <span className="px-3 py-1 text-sm font-semibold rounded-full bg-gray-50 border border-gray-200">
+                {bucketLabel(avg)}
+              </span>
+            </li>
+          ))}
+        </ul>
+
+        {/* Footer line */}
+        <div className="mt-6 flex items-center justify-between">
+          <div className="text-sm text-gray-700">
+            Overall you’re <b>{bucketLabel(circleAvg)}</b>.
+          </div>
+          <div className="flex gap-2">
+            <button className="btn btn-outline" onClick={() => setCircle("ESSENTIALS")}>Redo</button>
+            <button className="btn btn-primary" onClick={nextCircle}>
+              {isLast ? "Finish & Restart" : "Next circle"}
+            </button>
           </div>
         </div>
       </div>
-    );
-  }
+    </div>
+  );
+}
+
 
   // Question / intro screens
   const { block, qIndex } = current!;
