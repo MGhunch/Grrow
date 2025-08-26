@@ -162,4 +162,36 @@
   .grrow-actions { margin-top: 24px; } /* was 20px */
 }
 
+  /* Summary title uses Playfair like other headings */
+.grrow-summary-title{
+  font-family: 'Playfair Display','Open Sans',serif;
+  font-weight: 700;
+  font-size: clamp(26px,3.2vw,32px);
+  line-height: 1.2;
+  letter-spacing: -0.005em;
+  margin-bottom: 1rem;
+  color: var(--brand-purple);
+}
+
+/* Horizontal meter: purple = done, green = remaining to 100% */
+.grrow-meter{
+  display:flex;
+  height:10px;
+  width:100%;
+  border-radius:9999px;
+  overflow:hidden;
+  background:#e5e7eb; /* fallback track under segments */
+}
+.grrow-meter .done{
+  display:block;
+  height:100%;
+  background: var(--brand-purple);
+}
+.grrow-meter .remaining{
+  display:block;
+  height:100%;
+  background: var(--brand-green);
+}
+
+
 }
