@@ -165,9 +165,10 @@ export default function GrrowQuiz() {
             <h2 className="grrow-skillset-title">{block.skillset}</h2>
             <p className="grrow-question-sub text-gray-700">{block.objective}</p>
 
-            <div className="grrow-actions">
-              <button onClick={next} className="btn btn-green">Start questions</button>
-            </div>
+            <div className="grrow-actions justify-end">
+  <button onClick={next} className="btn btn-green">Let's grrow</button>
+</div>
+
           </>
         ) : (
           <>
