@@ -107,20 +107,23 @@ export default function GrrowQuiz() {
           <ul className="space-y-3">
             {blocks.map(({ skillset, avg }) => (
               <li
-                key={skillset}
-                className="flex flex-col gap-2 rounded-xl border p-4 bg-white shadow-sm"
-              >
-                {/* Green skillset name */}
-                <span className="font-semibold text-[var(--brand-green)]">{skillset}</span>
+  key={skillset}
+  className="flex flex-col gap-2 rounded-xl border p-4 bg-white shadow-sm"
+>
+  {/* Green skillset name */}
+  <span className="font-semibold text-[var(--brand-green)]">{skillset}</span>
 
-                {/* Progress meter */}
-                <div className="grrow-meter" role="img" aria-label={`${skillset} progress`}>
-                  <span className="done" style={{ width: `${avg}%` }} />
-                </div>
+  {/* Bar + Chip inline */}
+  <div className="flex items-center justify-between gap-4">
+    <div className="flex-1">
+      <div className="grrow-meter" role="img" aria-label={`${skillset} progress`}>
+        <span className="done" style={{ width: `${avg}%` }} />
+      </div>
+    </div>
+    <span className={chipClass(avg)}>{bucketLabel(avg)}</span>
+  </div>
+</li>
 
-                {/* Status chip */}
-                <span className={chipClass(avg)}>{bucketLabel(avg)}</span>
-              </li>
             ))}
           </ul>
 
