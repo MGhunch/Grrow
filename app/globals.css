@@ -136,4 +136,30 @@
   .grrow-wrap { max-width: 860px; margin-inline: auto; padding: 1.25rem; }
   .card-lg { border-radius: 20px; }
   .card-lg .inner { padding: 1.75rem 2rem; }
+
+  /* --- Micro spacing tune for quiz screens --- */
+@layer components {
+  /* Card padding: +4px */
+  .grrow-stage { padding: 28px; }
+  @media (min-width: 640px) { .grrow-stage { padding: 36px; } }
+
+  /* Breadcrumb: a touch more breathing room */
+  .grrow-breadcrumb { margin-bottom: 16px; } /* was ~12px */
+
+  /* Top progress bar: +4px below it */
+  .grrow-progress { margin: 8px 0 16px; }     /* was 6px 0 12px */
+  /* Bottom progress bar: +4px above it */
+  .grrow-progress:last-child { margin-top: 16px; }  /* was 12px */
+
+  /* Subheading/question: small lift */
+  .grrow-question-sub { margin-top: 14px; }
+
+  /* Slider block & labels: +4px around */
+  .grrow-slider-block { margin-top: 22px; margin-bottom: 22px; }
+  .grrow-scale { margin-top: 12px; } /* was 8px */
+
+  /* Actions row: +4px above buttons */
+  .grrow-actions { margin-top: 24px; } /* was 20px */
+}
+
 }
