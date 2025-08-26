@@ -137,6 +137,11 @@ export default function GrrowQuiz() {
                   </div>
                   <span className={chipClass(avg)}>{bucketLabel(avg)}</span>
                 </div>
+
+                {/* NEW helper line under each row (grey) */}
+                <p className="mt-2 text-sm text-gray-600">
+                  Here’s three questions to help you {skillset}.
+                </p>
               </li>
             ))}
           </ul>
