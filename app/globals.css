@@ -107,14 +107,14 @@
   .grrow-range::-moz-range-track { height: 8px; border-radius: 999px; background: #3AAA89; }
   .grrow-range::-webkit-slider-thumb {
     -webkit-appearance: none; appearance: none;
-    width: 26px; height: 26px; border-radius: 999px;
-    background: #5F259F; border: 4px solid #fff;
+    width: 28px; height: 28px; border-radius: 999px;
+    background: #5F259F; border: 2px solid #fff;
     box-shadow: 0 2px 6px rgba(0,0,0,.12);
-    margin-top: -12px; /* centers on 8px track */
+    margin-top: -10px; /* centers on 8px track */
   }
   .grrow-range::-moz-range-thumb {
-    width: 26px; height: 26px; border-radius: 999px;
-    background: #5F259F; border: 4px solid #fff;
+    width: 28px; height: 28px; border-radius: 999px;
+    background: #5F259F; border: 2px solid #fff;
     box-shadow: 0 2px 6px rgba(0,0,0,.12);
   }
   .grrow-scale {
