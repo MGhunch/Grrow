@@ -156,7 +156,7 @@ export default function GrrowQuiz() {
   return (
     <div className="grrow-wrap">
       <div className="grrow-stage">
-        <Progress current={linearIndex} total={total} />
+        <Progress current={linearIndex} total={total} className="mb-6" />
 
         <Breadcrumb circle={data.circle} strength={block.strength} />
 
