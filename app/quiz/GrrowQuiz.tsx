@@ -5,14 +5,8 @@ import Progress from './progress';
 import Breadcrumb from './breadcrumb';
 import ScaleLabels from './scalelabels';
 import { ANCHORS, CIRCLES } from './constants';
-import type { Question, StrengthBlock, QuizData, AnswerMap } from './types';
+import type { QuizData, AnswerMap } from './types';
 
-function bucketColor(score: number) {
-  if (score >= 75) return "text-[#5F259F]";
-  if (score >= 50) return "text-[#3AAA89]";
-  if (score >= 25) return "text-[#3AAA89]/50";
-  return "text-gray-300";
-}
 function bucketLabel(score: number) {
   if (score >= 75) return "Nailing it";
   if (score >= 50) return "Growing";
@@ -20,12 +14,19 @@ function bucketLabel(score: number) {
   return "Not yet";
 }
 
+// Map score → chip class
+function chipClass(score: number) {
+  if (score >= 75) return "chip chip-nailing";
+  if (score > 0)   return "chip chip-growing"; // learning/growing = green
+  return "chip chip-notyet";
+}
+
 export default function GrrowQuiz() {
   const [circle, setCircle] = useState<QuizData["circle"]>("ESSENTIALS");
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<QuizData | null>(null);
   const [answers, setAnswers] = useState<AnswerMap>({});
-  const [step, setStep] = useState<{ s: number; q: number } | null>(null); // s=strength idx, q=0 intro or 1..3
+  const [step, setStep] = useState<{ s: number; q: number } | null>(null);
 
   // Fetch questions for selected circle
   useEffect(() => {
@@ -79,77 +80,74 @@ export default function GrrowQuiz() {
 
   if (loading || !data) return <div className="p-6 text-gray-500">Loading…</div>;
 
- // Summary screen (per circle)
-if (!step) {
-  const blocks = data.strengths.map((b) => {
-    const ids = b.questions.map((q) => q.id);
-    const nums = ids.map((id) => answers[id]).filter((n) => typeof n === "number");
-    const avg = nums.length ? Math.round(nums.reduce((a, c) => a + c, 0) / nums.length) : 0;
-    return { skillset: b.skillset, avg };
-  });
-  const idx = CIRCLES.indexOf(circle);
-  const isLast = idx === CIRCLES.length - 1;
+  // ===================
+  // SUMMARY SCREEN
+  // ===================
+  if (!step) {
+    const blocks = data.strengths.map((b) => {
+      const ids = b.questions.map((q) => q.id);
+      const nums = ids.map((id) => answers[id]).filter((n) => typeof n === "number");
+      const avg = nums.length ? Math.round(nums.reduce((a, c) => a + c, 0) / nums.length) : 0;
+      return { skillset: b.skillset, avg };
+    });
+    const idx = CIRCLES.indexOf(circle);
+    const isLast = idx === CIRCLES.length - 1;
 
-  return (
-    <div className="grrow-wrap">
-      <div className="grrow-stage">
-        {/* Circle name in Playfair */}
-        <h1 className="grrow-summary-title">{data.circle}</h1>
+    return (
+      <div className="grrow-wrap">
+        <div className="grrow-stage">
+          {/* Title */}
+          <h1 className="grrow-summary-title">{data.circle}</h1>
 
-        {/* Copy tweak */}
-        <p className="text-gray-600 mb-6">Here’s your snapshot for this circle.</p>
+          {/* Purple subhead, sentence case */}
+          <p className="text-[var(--brand-purple)] mb-6">Here’s your snapshot for this circle</p>
 
-        {/* Skill rows */}
-        <ul className="space-y-3">
-          {blocks.map(({ skillset, avg }) => (
-            <li
-              key={skillset}
-              className="flex items-center justify-between gap-3 rounded-xl border p-4 bg-white shadow-sm"
-            >
-              <span className="font-medium">{skillset}</span>
+          {/* Skill blocks */}
+          <ul className="space-y-3">
+            {blocks.map(({ skillset, avg }) => (
+              <li
+                key={skillset}
+                className="flex flex-col gap-2 rounded-xl border p-4 bg-white shadow-sm"
+              >
+                {/* Green skillset name */}
+                <span className="font-semibold text-[var(--brand-green)]">{skillset}</span>
 
-              {/* Meter: purple = progress, green = to 100% */}
-              <div className="flex-1 max-w-[340px]">
+                {/* Progress meter */}
                 <div className="grrow-meter" role="img" aria-label={`${skillset} progress`}>
                   <span className="done" style={{ width: `${avg}%` }} />
-                  <span className="remaining" style={{ width: `${100 - avg}%` }} />
                 </div>
-              </div>
 
-              {/* Status label (no numbers) */}
-              <span className="px-3 py-1 text-sm font-semibold rounded-full bg-gray-50 border border-gray-200">
-                {bucketLabel(avg)}
-              </span>
-            </li>
-          ))}
-        </ul>
+                {/* Status chip */}
+                <span className={chipClass(avg)}>{bucketLabel(avg)}</span>
+              </li>
+            ))}
+          </ul>
 
-        {/* Footer line */}
-        <div className="mt-6 flex items-center justify-between">
-          <div className="text-sm text-gray-700">
-            Overall you’re <b>{bucketLabel(circleAvg)}</b>.
-          </div>
-          <div className="flex gap-2">
-            <button className="btn btn-outline" onClick={() => setCircle("ESSENTIALS")}>Redo</button>
-            <button className="btn btn-primary" onClick={nextCircle}>
-              {isLast ? "Finish & Restart" : "Next circle"}
-            </button>
+          {/* Footer */}
+          <div className="mt-6 flex items-center justify-between">
+            <div className="text-sm text-gray-700">
+              Overall you’re <b>{bucketLabel(circleAvg)}</b>.
+            </div>
+            <div className="flex gap-2">
+              <button className="btn btn-outline" onClick={() => setCircle("ESSENTIALS")}>Redo</button>
+              <button className="btn btn-primary" onClick={nextCircle}>
+                {isLast ? "Finish & Restart" : "Next circle"}
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  );
-}
+    );
+  }
 
-
-  // Question / intro screens
+  // ===================
+  // QUESTION SCREENS
+  // ===================
   const { block, qIndex } = current!;
   const question = qIndex ? block.questions[qIndex - 1] : null;
 
-  // show progress-so-far on intros, and the 1-based count on questions
-const answeredSoFar = step!.s * 3; // 0, 3, 6, 9...
-const linearIndex = qIndex === 0 ? answeredSoFar : answeredSoFar + (qIndex - 1) + 1;
-const total = data.strengths.length * 3;
+  const linearIndex = qIndex === 0 ? 0 : step!.s * 3 + (qIndex - 1) + 1;
+  const total = data.strengths.length * 3;
 
   return (
     <div className="grrow-wrap">
