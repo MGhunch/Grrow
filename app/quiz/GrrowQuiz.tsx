@@ -97,8 +97,9 @@ export default function GrrowQuiz() {
       <div className="grrow-wrap">
         <div className="grrow-stage">
           {/* Title */}
-          <h1 className="grrow-summary-title">{data.circle}</h1>
-
+        <h1 className="grrow-summary-title">
+  {data.circle.charAt(0) + data.circle.slice(1).toLowerCase()}
+</h1>
           {/* Purple subhead, sentence case */}
           <p className="text-[var(--brand-purple)] mb-6">Here’s your snapshot for this circle</p>
 
