@@ -1,6 +1,11 @@
 'use client'
 
-import { useMemo, useState, useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import type { Question, StrengthBlock, QuizData, AnswerMap } from './types';
+import { ANCHORS, CIRCLES } from './constants';
+import Progress from './components/progress';
+import Breadcrumb from './components/breadcrumb';
+import ScaleLabels from './components/scalelabels';
 
 
 
