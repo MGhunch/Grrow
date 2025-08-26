@@ -162,7 +162,7 @@
   .grrow-actions { margin-top: 24px; } /* was 20px */
 }
 
-  /* Summary title uses Playfair like other headings */
+ /* Summary title uses Playfair like other headings */
 .grrow-summary-title{
   font-family: 'Playfair Display','Open Sans',serif;
   font-weight: 700;
@@ -172,6 +172,47 @@
   margin-bottom: 1rem;
   color: var(--brand-purple);
 }
+
+/* Horizontal meter: purple overlay = progress, green base = remaining */
+.grrow-meter{
+  position: relative;
+  display:flex;
+  height:10px;
+  width:100%;
+  border-radius:9999px;
+  overflow:hidden;
+  background: var(--brand-green); /* full green base */
+}
+.grrow-meter .done{
+  display:block;
+  height:100%;
+  background: var(--brand-purple); /* fills from left */
+}
+
+/* Status chip colors */
+.chip{
+  @apply px-3 py-1 text-sm font-semibold rounded-full border;
+}
+
+.chip-notyet{
+  background:#f9fafb;
+  border-color:#d1d5db; /* gray-300 */
+  color:#6b7280;        /* gray-500 */
+}
+
+.chip-learning,
+.chip-growing{
+  background: #ecfdf5;   /* green-50 */
+  border-color: #a7f3d0; /* green-200 */
+  color: var(--brand-green);
+}
+
+.chip-nailing{
+  background: #f5f3ff;   /* purple-50 */
+  border-color: #ddd6fe; /* purple-200 */
+  color: var(--brand-purple);
+}
+
 
 /* Horizontal meter: purple = done, green = remaining to 100% */
 .grrow-meter{
