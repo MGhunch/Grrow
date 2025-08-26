@@ -137,11 +137,6 @@ export default function GrrowQuiz() {
                   </div>
                   <span className={chipClass(avg)}>{bucketLabel(avg)}</span>
                 </div>
-
-                {/* NEW helper line under each row (grey) */}
-                <p className="mt-2 text-sm text-gray-600">
-                  Here’s three questions to help you {skillset}.
-                </p>
               </li>
             ))}
           </ul>
@@ -189,8 +184,11 @@ export default function GrrowQuiz() {
         {qIndex === 0 ? (
           <>
             <h2 className="grrow-skillset-title">{block.skillset}</h2>
-            <p className="grrow-question-sub text-gray-700">{block.objective}</p>
-
+            <p className="grrow-question-sub text-gray-700">{block.objective}</p></br>
+            <p className="mt-4 text-sm text-gray-600">
+            Here’s three questions to help you {block.skillset}.
+            </p>
+            
             <div className="grrow-actions justify-end">
               <button onClick={next} className="btn btn-green">Let's Grrow</button>
             </div>
