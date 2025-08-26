@@ -187,7 +187,7 @@ export default function GrrowQuiz() {
             <p className="grrow-question-sub text-gray-700">{block.objective}</p>
 
             <div className="grrow-actions justify-end">
-              <button onClick={next} className="btn btn-green">Start questions</button>
+              <button onClick={next} className="btn btn-green">Let's Grrow</button>
             </div>
           </>
         ) : (
