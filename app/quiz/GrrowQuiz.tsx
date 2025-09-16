@@ -34,7 +34,7 @@ export default function GrrowQuiz() {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<QuizData | null>(null);
   const [answers, setAnswers] = useState<AnswerMap>({});
-  const [step, setStep] = useState<{ s: number; q: number } | null>(null); // s=strength idx, q=0 intro or 1..3
+  const [step, setStep] = useState<{ s: number; q: number } | null>(null);
 
   useEffect(() => {
     const fetcher = async () => {
@@ -71,7 +71,7 @@ export default function GrrowQuiz() {
     if (q === 0) return setStep({ s, q: 1 });
     if (q < 3) return setStep({ s, q: (q + 1) as 1 | 2 | 3 });
     if (s < data.strengths.length - 1) return setStep({ s: s + 1, q: 0 });
-    setStep(null); // summary
+    setStep(null);
   }
   function back() {
     if (!data || !step) return;
@@ -136,7 +136,6 @@ export default function GrrowQuiz() {
   const { block, qIndex } = current!;
   const question = qIndex ? block.questions[qIndex - 1] : null;
 
-  // 12-question progress within circle
   const linearIndex = qIndex === 0 ? 0 : step!.s * 3 + (qIndex - 1) + 1;
   const total = data.strengths.length * 3;
 
@@ -144,13 +143,12 @@ export default function GrrowQuiz() {
     <div className="grrow-wrap">
       <div className="grrow-stage">
         <Progress current={linearIndex} total={total} />
-
         <Breadcrumb circle={data.circle} strength={block.strength} />
 
         {qIndex === 0 ? (
           <>
             {/* Intro screen */}
-            <h2 className="grrow-skillset-title font-medium mt-6">{block.skillset}</h2>
+            <h2 className="grrow-skillset-title mt-6">{block.skillset}</h2>
             <p className="grrow-question-sub text-gray-700">{block.objective}</p>
 
             <div className="grrow-actions mt-8 mb-6">
@@ -160,7 +158,7 @@ export default function GrrowQuiz() {
         ) : (
           <>
             {/* Question screen */}
-            <h2 className="grrow-skillset-title font-medium">{block.skillset}</h2>
+            <h2 className="grrow-skillset-title">{block.skillset}</h2>
             <p className="grrow-question-sub">{question!.text}</p>
 
             {/* Radio-card answers */}
@@ -184,7 +182,7 @@ export default function GrrowQuiz() {
               })}
             </div>
 
-            {/* Actions row: Back, Next, and ? aligned right */}
+            {/* Actions row */}
             <div className="grrow-actions mt-6 mb-8">
               <div className="right" style={{ display: 'flex', gap: '8px', marginLeft: 'auto' }}>
                 <button onClick={back} className="btn btn-outline">Back</button>
@@ -192,7 +190,6 @@ export default function GrrowQuiz() {
                 <button
                   className="tooltip-btn"
                   aria-label="Help"
-                  /* Orange circle + grey question mark */
                   style={{ background: 'var(--accent)', color: '#374151', border: 'none' }}
                 >
                   ?
