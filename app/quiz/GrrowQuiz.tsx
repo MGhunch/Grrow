@@ -149,16 +149,18 @@ export default function GrrowQuiz() {
 
         {qIndex === 0 ? (
           <>
+            {/* Intro screen */}
             <h2 className="grrow-skillset-title font-medium mt-6">{block.skillset}</h2>
             <p className="grrow-question-sub text-gray-700">{block.objective}</p>
 
-            <div className="grrow-actions mt-8 mb-4">
+            <div className="grrow-actions mt-8 mb-6">
               <button onClick={next} className="btn btn-accent">Start questions</button>
             </div>
           </>
         ) : (
           <>
-            <h2 className="grrow-skillset-title">{block.skillset}</h2>
+            {/* Question screen */}
+            <h2 className="grrow-skillset-title font-medium">{block.skillset}</h2>
             <p className="grrow-question-sub">{question!.text}</p>
 
             {/* Radio-card answers */}
@@ -182,11 +184,19 @@ export default function GrrowQuiz() {
               })}
             </div>
 
-            <div className="grrow-actions">
-              <button className="tooltip-btn" aria-label="Help">?</button>
-              <div className="right">
+            {/* Actions row: Back, Next, and ? aligned right */}
+            <div className="grrow-actions mt-6 mb-8">
+              <div className="right" style={{ display: 'flex', gap: '8px', marginLeft: 'auto' }}>
                 <button onClick={back} className="btn btn-outline">Back</button>
                 <button onClick={next} className="btn btn-accent">Next</button>
+                <button
+                  className="tooltip-btn"
+                  aria-label="Help"
+                  /* Orange circle + grey question mark */
+                  style={{ background: 'var(--accent)', color: '#374151', border: 'none' }}
+                >
+                  ?
+                </button>
               </div>
             </div>
           </>
