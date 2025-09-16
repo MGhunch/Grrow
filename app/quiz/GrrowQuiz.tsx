@@ -149,10 +149,10 @@ export default function GrrowQuiz() {
 
         {qIndex === 0 ? (
           <>
-            <h2 className="grrow-skillset-title">{block.skillset}</h2>
+            <h2 className="grrow-skillset-title font-medium mt-6">{block.skillset}</h2>
             <p className="grrow-question-sub text-gray-700">{block.objective}</p>
 
-            <div className="grrow-actions">
+            <div className="grrow-actions mt-8 mb-4">
               <button onClick={next} className="btn btn-accent">Start questions</button>
             </div>
           </>
