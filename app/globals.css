@@ -1,238 +1,163 @@
-/* app/globals.css  — clean + consolidated */
+/* === Grrow global styles =============================================== */
+/* Fonts: Poppins (replaces Open Sans / Playfair) */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap');
 
-/* 1) Fonts FIRST */
-@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap');
-
-/* 2) Tailwind layers */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* 3) Base tokens + base element tweaks */
-:root {
-  --brand-purple: #5F259F;
-  --brand-green:  #3AAA89;
+/* Brand tokens */
+:root{
+  --brand-purple:#5F259F;   /* keep for secondary uses */
+  --brand-green:#3AAA89;    /* keep for secondary uses */
+  --accent:#EE7BF9;         /* NEW: prototype accent */
 }
 
-@layer base {
-  html, body { height: 100%; }
-  body {
-    font-family: 'Open Sans', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
-    color: #111827;
-    background: #f9fafb;
-  }
-  :focus-visible { outline: 2px solid var(--brand-green); outline-offset: 2px; }
+html, body { height: 100%; }
+body{
+  font-family:'Poppins', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  color:#111827;
+  background:#f9fafb;
 }
 
-/* 4) Reusable UI atoms */
-@layer components {
-  .pill { @apply inline-flex items-center px-2 py-1 text-xs rounded-full bg-gray-100 border border-gray-200; }
-  .card { @apply rounded-2xl border border-gray-200 bg-white shadow-sm; }
-
-  .btn { @apply inline-flex items-center justify-center font-medium px-5 py-2.5; border-radius: 9999px; }
-  .btn-primary { background: var(--brand-purple); color: #fff; }
-  .btn-primary:hover { filter: brightness(1.05); }
-  .btn-outline { background: #f3f4f6; border: none; color: #111827; }
-  .btn-outline:disabled { @apply opacity-50 cursor-not-allowed; }
-  .btn-green { background: var(--brand-green); color: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.06); }
-  .btn-green:hover { filter: brightness(1.06); }
-  .btn-green:focus-visible { outline: 2px solid transparent; box-shadow: 0 0 0 4px rgba(58,170,137,.25); }
-}
-
-/* 5) GRROW quiz styles */
-@layer components {
-  /* Headings */
-  .grrow-skillset-title {
-    font-family: 'Playfair Display','Open Sans',serif;
-    font-weight: 700;
-    font-size: clamp(26px, 3.2vw, 32px);
-    line-height: 1.2;
-    letter-spacing: -0.005em;
-    margin-bottom: 1rem;
-    color: var(--brand-purple);
-  }
-  .grrow-question-sub {
-    font-size: 15px;
-    line-height: 1.6;
-    color: #5a3aa3;
-    margin-top: .75rem;
-  }
-
-  /* Breadcrumb */
-  .grrow-breadcrumb {
-    display: flex; flex-wrap: wrap; gap: .5rem; align-items: center;
-    font-size: 12px; font-weight: 600; letter-spacing: .02em;
-    color: var(--brand-purple);
-    margin-bottom: .75rem;
-  }
-  .grrow-breadcrumb .sep { opacity: .5; }
-
-  /* Stage container (wraps bars + card) */
-  .grrow-stage {
-    background: #fff;
-    border: 1px solid #e5e7eb;
-    border-radius: 20px;
-    box-shadow: 0 1px 2px rgba(0,0,0,.04);
-    padding: 24px;
-  }
-  @media (min-width: 640px) {
-    .grrow-stage { padding: 32px; }
-  }
-
-  /* Progress bars */
-  .grrow-progress {
-    height: 6px;
-    border-radius: 999px;
-    background: #e5e7eb; /* gray-200 */
-    overflow: hidden;
-    margin: 6px 0 12px;
-  }
-  .grrow-progress:last-child { margin: 12px 0 0; }
-  .grrow-progress .bar {
-    height: 100%;
-    width: 0%;
-    background: linear-gradient(90deg, var(--brand-green), var(--brand-purple));
-    transition: width .25s ease;
-  }
-
-  /* Slider block */
-  .grrow-slider-block { margin-top: 16px; margin-bottom: 18px; }
-  .grrow-range {
-    width: 100%; appearance: none; -webkit-appearance: none;
-    height: 8px; background: #d1fae5; border-radius: 999px; outline: none;
-    position: relative;
-  }
-  .grrow-range::-webkit-slider-runnable-track { height: 8px; border-radius: 999px; background: #3AAA89; }
-  .grrow-range::-moz-range-track { height: 8px; border-radius: 999px; background: #3AAA89; }
-  .grrow-range::-webkit-slider-thumb {
-    -webkit-appearance: none; appearance: none;
-    width: 28px; height: 28px; border-radius: 999px;
-    background: #5F259F; border: 2px solid #fff;
-    box-shadow: 0 2px 6px rgba(0,0,0,.12);
-    margin-top: -10px; /* centers on 8px track */
-  }
-  .grrow-range::-moz-range-thumb {
-    width: 28px; height: 28px; border-radius: 999px;
-    background: #5F259F; border: 2px solid #fff;
-    box-shadow: 0 2px 6px rgba(0,0,0,.12);
-  }
-  .grrow-scale {
-    display: flex; justify-content: space-between; align-items: center;
-    margin-top: .5rem; font-size: 12px; font-weight: 500; color: #6b7280;
-  }
-
-  /* Actions row + tooltip */
-  .grrow-actions { display: flex; align-items: center; justify-content: space-between; gap: .75rem; margin-top: 1.25rem; }
-  .grrow-actions .right { display: flex; gap: .5rem; }
-  .tooltip-btn {
-    width: 44px; height: 44px; border-radius: 9999px;
-    display: inline-flex; align-items: center; justify-content: center;
-    background: #fff; border: 2px solid var(--brand-green);
-    font-weight: 800; font-size: 18px; color: var(--brand-purple);
-  }
-
-  /* Layout helpers */
-  .grrow-wrap { max-width: 860px; margin-inline: auto; padding: 1.25rem; }
-  .card-lg { border-radius: 20px; }
-  .card-lg .inner { padding: 1.75rem 2rem; }
-
-  /* --- Micro spacing tune for quiz screens --- */
-@layer components {
-  /* Card padding: +4px */
-  .grrow-stage { padding: 28px; }
-  @media (min-width: 640px) { .grrow-stage { padding: 36px; } }
-
-  /* Breadcrumb: a touch more breathing room */
-  .grrow-breadcrumb { margin-bottom: 16px; } /* was ~12px */
-
-  /* Top progress bar: +4px below it */
-  .grrow-progress { margin: 8px 0 16px; }     /* was 6px 0 12px */
-  /* Bottom progress bar: +4px above it */
-  .grrow-progress:last-child { margin-top: 16px; }  /* was 12px */
-
-  /* Subheading/question: small lift */
-  .grrow-question-sub { margin-top: 14px; }
-
-  /* Slider block & labels: +4px around */
-  .grrow-slider-block { margin-top: 22px; margin-bottom: 22px; }
-  .grrow-scale { margin-top: 12px; } /* was 8px */
-
-  /* Actions row: +4px above buttons */
-  .grrow-actions { margin-top: 24px; } /* was 20px */
-}
-
- /* Summary title uses Playfair like other headings */
-.grrow-summary-title{
-  font-family: 'Playfair Display','Open Sans',serif;
-  font-weight: 700;
-  font-size: clamp(26px,3.2vw,32px);
+/* ---------- Type & headings ---------- */
+.grrow-skillset-title{
+  font-family: 'Poppins', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: clamp(26px, 3.2vw, 32px);
   line-height: 1.2;
   letter-spacing: -0.005em;
   margin-bottom: 1rem;
+  color: #111827;
+}
+.grrow-question-sub{
+  font-size: 15px;
+  line-height: 1.7;
+  margin-top: 1rem;
+  color:#374151;
+}
+
+/* ---------- Layout wrappers ---------- */
+.grrow-wrap{ max-width: 860px; margin-inline:auto; padding: 1.25rem; }
+.grrow-stage{
+  background:#fff;
+  border:1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 1px 2px rgba(0,0,0,.04);
+  padding: 32px;
+}
+
+/* ---------- Breadcrumb chip ---------- */
+.grrow-breadcrumb{
+  display:flex; flex-wrap:wrap; gap:8px;
+  align-items:center;
+  font-size:12px; font-weight:700; letter-spacing:.02em;
+  margin-bottom:.75rem;
+}
+.grrow-breadcrumb .circle{
+  background: color-mix(in srgb, var(--accent) 14%, white);
+  color: var(--accent);
+  padding:6px 10px; border-radius:9999px;
+}
+.grrow-breadcrumb .sep{ opacity:.5; }
+.grrow-breadcrumb .strength{ color:#374151; }
+
+/* ---------- Progress (top & bottom thin bar) ---------- */
+.grrow-progress{
+  height: 6px;
+  border-radius: 999px;
+  background: #e5e7eb;
+  overflow: hidden;
+  margin: 6px 0 12px;
+}
+.grrow-progress .bar{
+  height:100%;
+  width:0%;
+  background: var(--accent);
+  transition: width .25s ease;
+}
+
+/* ---------- Buttons ---------- */
+.btn{ @apply inline-flex items-center justify-center font-medium; border-radius: 9999px; padding: 12px 18px; }
+.btn-accent{ background: var(--accent); color:#fff; }
+.btn-accent:hover{ filter: brightness(1.05); }
+.btn-outline{ background:#f3f4f6; border:none; color:#111827; }
+.btn-outline:disabled{ opacity:.5; cursor:not-allowed; }
+
+/* ---------- Radio-card answers (replaces slider UI) ---------- */
+.grrow-options{ display:grid; gap:10px; margin: 14px 0; }
+.grrow-option{
+  display:flex; align-items:center; gap:12px;
+  background:#fff; border:2px solid #e5e7eb; border-radius:14px;
+  padding:14px 16px; cursor:pointer;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+.grrow-option .dot{
+  width:18px; height:18px; border-radius:9999px;
+  box-shadow: inset 0 0 0 2px #d1d5db;
+}
+.grrow-option .text{ font-weight:600; color:#111827; }
+.grrow-option:is(:hover, :focus-within){ border-color:#d1d5db; }
+.grrow-option.is-selected{
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 25%, transparent);
+}
+.grrow-option.is-selected .dot{ box-shadow: inset 0 0 0 6px var(--accent); }
+
+/* ---------- Results: status pill + mini bar ---------- */
+.skill-row{
+  padding:10px 12px;
+  border:1px solid #e5e7eb;
+  border-radius:12px;
+  background:#fff;
+}
+.skill-row .top{
+  display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;
+}
+.skill-row .name{ font-weight:600; color:#111827; }
+.status-pill{
+  font-size:11px; font-weight:800; letter-spacing:.02em;
+  padding:4px 8px; border-radius:9999px;
+  background:#f3f4f6; color:#6b7280;
+}
+.status-pill.is-growing,
+.status-pill.is-learning,
+.status-pill.is-nailing{
+  background: color-mix(in srgb, var(--accent) 14%, white);
+  color: var(--accent);
+}
+.mini-bar{ height:6px; background:#e5e7eb; border-radius:9999px; overflow:hidden; }
+.mini-bar .fill{ display:block; height:100%; background: var(--accent); }
+
+/* ---------- Tooltip “?” (kept) ---------- */
+.tooltip-btn{
+  width: 44px; height: 44px;
+  font-weight: 800; font-size: 18px;
+  border-radius: 9999px;
+  display:inline-flex; align-items:center; justify-content:center;
+  background:#fff; border:2px solid var(--brand-green); /* secondary */
   color: var(--brand-purple);
 }
 
-/* Horizontal meter: purple overlay = progress, green base = remaining */
-.grrow-meter{
-  position: relative;
-  display:flex;
-  height:10px;
-  width:100%;
-  border-radius:9999px;
-  overflow:hidden;
-  background: var(--brand-green); /* full green base */
-}
-.grrow-meter .done{
-  display:block;
-  height:100%;
-  background: var(--brand-purple); /* fills from left */
-}
+/* ---------- Accessibility ---------- */
+:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
 
-/* Status chip colors */
-.chip{
-  @apply px-3 py-1 text-sm font-semibold rounded-full border;
+/* ---------- Legacy slider styles (kept but unused) ---------- */
+/* Keeping these so nothing breaks while we migrate away from sliders.
+   You can safely remove later if not needed. */
+.grrow-slider-block{ margin-top: 16px; margin-bottom: 18px; }
+.grrow-range{ width:100%; appearance:none; -webkit-appearance:none; height:8px;
+  background: #d1fae5; border-radius:999px; outline:none; position:relative;
 }
-
-.chip-notyet{
-  background:#f9fafb;
-  border-color:#d1d5db; /* gray-300 */
-  color:#6b7280;        /* gray-500 */
+.grrow-range::-webkit-slider-runnable-track{ height:8px; border-radius:999px; background: #3AAA89; }
+.grrow-range::-moz-range-track{ height:8px; border-radius:999px; background: #3AAA89; }
+.grrow-range::-webkit-slider-thumb{
+  -webkit-appearance:none; appearance:none;
+  width:26px; height:26px; border-radius:999px;
+  background: #5F259F; border: 4px solid white; box-shadow:0 2px 6px rgba(0,0,0,.12);
+  margin-top:-10px;
 }
-
-.chip-learning,
-.chip-growing{
-  background: #ecfdf5;   /* green-50 */
-  border-color: #a7f3d0; /* green-200 */
-  color: var(--brand-green);
-}
-
-.chip-nailing{
-  background: #f5f3ff;   /* purple-50 */
-  border-color: #ddd6fe; /* purple-200 */
-  color: var(--brand-purple);
-}
-
-
-/* Horizontal meter: purple = done, green = remaining to 100% */
-.grrow-meter{
-  display:flex;
-  height:10px;
-  width:100%;
-  border-radius:9999px;
-  overflow:hidden;
-  background:#e5e7eb; /* fallback track under segments */
-}
-.grrow-meter .done{
-  display:block;
-  height:100%;
-  background: var(--brand-purple);
-}
-.grrow-meter .remaining{
-  display:block;
-  height:100%;
-  background: var(--brand-green);
-}
-
-
+.grrow-range::-moz-range-thumb{
+  width:26px; height:26px; border-radius:999px;
+  background:#5F259F; border:4px solid white; box-shadow:0 2px 6px rgba(0,0,0,.12);
 }
