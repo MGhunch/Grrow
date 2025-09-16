@@ -1,3 +1,19 @@
+import { redirect } from "next/navigation";
+
+export default function Home() {
+  redirect("/quiz"); // server-side redirect
+}
+``` [oai_citation:0‡page (1).tsx](file-service://file-Sc6WJk7B8igbdzZh4tPHnr)
+
+That’s why your app always goes straight into the quiz — this redirect runs before your landing page can render.
+
+---
+
+✅ **Fix**
+
+Replace `app/page.tsx` with your proper landing page component (the one you pasted earlier with the “Start the Quiz” button). For example:
+
+```tsx
 'use client';
 
 import { useRouter } from 'next/navigation';
@@ -8,7 +24,6 @@ export default function Home() {
   return (
     <main className="grrow-wrap">
       <section className="grrow-stage">
-        {/* Decorative progress (keeps visual language) */}
         <div className="grrow-progress" aria-hidden>
           <div className="bar" style={{ width: '0%' }} />
         </div>
@@ -37,39 +52,6 @@ export default function Home() {
 
         <div className="grrow-progress mt-6" aria-hidden>
           <div className="bar" style={{ width: '0%' }} />
-        </div>
-      </section>
-
-      {/* Optional explainer tiles */}
-      <section id="how-it-works" className="mt-8 space-y-4">
-        <div className="skill-row">
-          <div className="top">
-            <span className="name">Answer 12 quick questions</span>
-            <span className="status-pill is-learning">FAST</span>
-          </div>
-          <div className="mini-bar" aria-hidden>
-            <span className="fill" style={{ width: '25%' }} />
-          </div>
-        </div>
-
-        <div className="skill-row">
-          <div className="top">
-            <span className="name">See your snapshot for each circle</span>
-            <span className="status-pill is-growing">INSIGHTS</span>
-          </div>
-          <div className="mini-bar" aria-hidden>
-            <span className="fill" style={{ width: '50%' }} />
-          </div>
-        </div>
-
-        <div className="skill-row">
-          <div className="top">
-            <span className="name">Pick Keep / Focus / Grow</span>
-            <span className="status-pill is-nailing">ACTION</span>
-          </div>
-          <div className="mini-bar" aria-hidden>
-            <span className="fill" style={{ width: '75%' }} />
-          </div>
         </div>
       </section>
     </main>
