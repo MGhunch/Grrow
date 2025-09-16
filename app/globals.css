@@ -28,13 +28,13 @@ body{
   line-height: 1.2;
   letter-spacing: -0.005em;
   margin-bottom: 1rem;
-  color: #111827;
+  color: #797979;
 }
 .grrow-question-sub{
   font-size: 15px;
   line-height: 1.7;
   margin-top: 1rem;
-  color:#374151;
+  color:#797979;
 }
 
 /* ---------- Layout wrappers ---------- */
@@ -132,11 +132,11 @@ body{
 /* ---------- Tooltip “?” (kept) ---------- */
 .tooltip-btn{
   width: 44px; height: 44px;
-  font-weight: 800; font-size: 18px;
+  font-weight: 600; font-size: 18px;
   border-radius: 9999px;
   display:inline-flex; align-items:center; justify-content:center;
-  background:#fff; border:2px solid var(--brand-green); /* secondary */
-  color: var(--brand-purple);
+  background:#fff; border:2px solid var(--accent); /* secondary */
+  color: #374151;
 }
 
 /* ---------- Accessibility ---------- */
