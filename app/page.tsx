@@ -1,19 +1,3 @@
-import { redirect } from "next/navigation";
-
-export default function Home() {
-  redirect("/quiz"); // server-side redirect
-}
-``` [oai_citation:0‡page (1).tsx](file-service://file-Sc6WJk7B8igbdzZh4tPHnr)
-
-That’s why your app always goes straight into the quiz — this redirect runs before your landing page can render.
-
----
-
-✅ **Fix**
-
-Replace `app/page.tsx` with your proper landing page component (the one you pasted earlier with the “Start the Quiz” button). For example:
-
-```tsx
 'use client';
 
 import { useRouter } from 'next/navigation';
@@ -24,6 +8,7 @@ export default function Home() {
   return (
     <main className="grrow-wrap">
       <section className="grrow-stage">
+        {/* decorative progress */}
         <div className="grrow-progress" aria-hidden>
           <div className="bar" style={{ width: '0%' }} />
         </div>
@@ -44,10 +29,7 @@ export default function Home() {
           >
             Start the Quiz
           </button>
-
-          <a href="#how-it-works" className="btn btn-outline">
-            How it works
-          </a>
+          <a href="#how-it-works" className="btn btn-outline">How it works</a>
         </div>
 
         <div className="grrow-progress mt-6" aria-hidden>
