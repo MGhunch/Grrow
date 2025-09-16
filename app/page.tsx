@@ -8,7 +8,7 @@ export default function Home() {
   return (
     <main className="grrow-wrap">
       <section className="grrow-stage">
-        {/* Decorative progress, stays at 0% */}
+        {/* Decorative progress (keeps visual language) */}
         <div className="grrow-progress" aria-hidden>
           <div className="bar" style={{ width: '0%' }} />
         </div>
@@ -40,6 +40,7 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Optional explainer tiles */}
       <section id="how-it-works" className="mt-8 space-y-4">
         <div className="skill-row">
           <div className="top">
