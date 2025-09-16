@@ -10,7 +10,7 @@
 :root{
   --brand-purple:#5F259F;   /* keep for secondary uses */
   --brand-green:#3AAA89;    /* keep for secondary uses */
-  --accent:#EE7BF9;         /* NEW: prototype accent */
+  --accent:#EE7B59;         /* NEW: prototype accent */
 }
 
 html, body { height: 100%; }
