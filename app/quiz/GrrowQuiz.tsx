@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import Progress from './quizprogress';
+import Progress from './progress';
 import Breadcrumb from './breadcrumb';
 // Removed ScaleLabels + slider anchors
 import { CIRCLES } from './constants';
