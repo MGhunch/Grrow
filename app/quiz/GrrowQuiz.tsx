@@ -3,11 +3,10 @@
 import { useEffect, useMemo, useState } from 'react';
 import Progress from './progress';
 import Breadcrumb from './breadcrumb';
-// Removed ScaleLabels + slider anchors
 import { CIRCLES } from './constants';
 import type { QuizData, AnswerMap } from './types';
 
-// Status helpers (copy aligned to prototype tone)
+// Map % to status text / class
 function bucketLabel(score: number) {
   if (score >= 75) return 'Nailing it';
   if (score >= 50) return 'Growing';
@@ -15,14 +14,14 @@ function bucketLabel(score: number) {
   return 'Not yet';
 }
 function statusClass(score: number) {
-  const label = bucketLabel(score).toLowerCase();
-  if (label.includes('nailing')) return 'is-nailing';
-  if (label.includes('growing')) return 'is-growing';
-  if (label.includes('learning')) return 'is-learning';
+  const l = bucketLabel(score).toLowerCase();
+  if (l.includes('nailing')) return 'is-nailing';
+  if (l.includes('growing')) return 'is-growing';
+  if (l.includes('learning')) return 'is-learning';
   return 'is-notyet';
 }
 
-// Discrete options for radio-card answers
+// Discrete radio options
 const OPTIONS = [
   { label: 'Not yet', value: 0 },
   { label: 'Sometimes', value: 33 },
@@ -37,7 +36,6 @@ export default function GrrowQuiz() {
   const [answers, setAnswers] = useState<AnswerMap>({});
   const [step, setStep] = useState<{ s: number; q: number } | null>(null); // s=strength idx, q=0 intro or 1..3
 
-  // Fetch questions for selected circle
   useEffect(() => {
     const fetcher = async () => {
       setLoading(true);
@@ -73,7 +71,7 @@ export default function GrrowQuiz() {
     if (q === 0) return setStep({ s, q: 1 });
     if (q < 3) return setStep({ s, q: (q + 1) as 1 | 2 | 3 });
     if (s < data.strengths.length - 1) return setStep({ s: s + 1, q: 0 });
-    setStep(null); // show summary
+    setStep(null); // summary
   }
   function back() {
     if (!data || !step) return;
@@ -89,7 +87,7 @@ export default function GrrowQuiz() {
 
   if (loading || !data) return <div className="p-6 text-gray-500">Loading…</div>;
 
-  // Summary screen (per circle)
+  // Summary
   if (!step) {
     const blocks = data.strengths.map((b) => {
       const ids = b.questions.map((q) => q.id);
@@ -99,8 +97,6 @@ export default function GrrowQuiz() {
       const avg = nums.length ? Math.round(nums.reduce((a, c) => a + c, 0) / nums.length) : 0;
       return { skillset: b.skillset, avg };
     });
-    const idx = CIRCLES.indexOf(circle);
-    const isLast = idx === CIRCLES.length - 1;
 
     return (
       <div className="grrow-wrap">
@@ -128,9 +124,7 @@ export default function GrrowQuiz() {
             </div>
             <div className="flex gap-2">
               <button className="btn btn-outline" onClick={() => setCircle('ESSENTIALS')}>Start Over</button>
-              <button className="btn btn-accent" onClick={nextCircle}>
-                {isLast ? 'Next Circle' /* loops back by design */ : 'Next Circle'}
-              </button>
+              <button className="btn btn-accent" onClick={nextCircle}>Next Circle</button>
             </div>
           </div>
         </div>
