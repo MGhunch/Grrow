@@ -78,7 +78,12 @@ body{
 }
 
 /* ---------- Buttons ---------- */
-.btn{ @apply inline-flex items-center justify-center font-medium; border-radius: 9999px; padding: 12px 18px; }
+.btn{
+  @apply inline-flex items-center justify-center rounded-full
+         px-5 py-3 text-base font-medium select-none;
+  min-height: 44px;             /* Apple HIG minimum */
+  touch-action: manipulation;    /* reduces 300ms delay on some browsers */
+}
 .btn-accent{ background: var(--accent); color:#fff; }
 .btn-accent:hover{ filter: brightness(1.05); }
 .btn-outline{ background:#f3f4f6; border:none; color:#111827; }
