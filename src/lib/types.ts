@@ -1,6 +1,8 @@
 // ═══════════════════════════════════════════════════════════════════════════
-// Grrow Type Definitions
+// Grrow Type Definitions — Single Source of Truth
 // ═══════════════════════════════════════════════════════════════════════════
+
+import type { LucideIcon } from "lucide-react";
 
 // ── Base Types ────────────────────────────────────────────────────────────
 
@@ -15,6 +17,31 @@ export type ScoreState = "Not yet" | "Learning" | "Growing" | "Nailing it";
 
 export type ScoreMap = Record<string, ScoreState>;
 export type KfgMap = Record<string, KfgCategory>;
+
+// ── Strength & Ring Definitions ───────────────────────────────────────────
+
+export interface SkillsetDef {
+  name: string;
+  objective: string;
+}
+
+export interface Strength {
+  name: StrengthName;
+  family: StrengthFamily;
+  icon: LucideIcon;
+  start: number;
+  labelReversed: boolean;
+  skillsets: SkillsetDef[];
+}
+
+export interface Ring {
+  name: Circle;
+  innerR: number;
+  outerR: number;
+}
+
+// Legacy alias
+export type CircleLayer = Ring;
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Report Types
@@ -56,7 +83,7 @@ export interface SnapshotData {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// Circle Descriptions — TODO: Move to RING_STAGES in skillsets.ts
+// Circle Descriptions
 // ═══════════════════════════════════════════════════════════════════════════
 
 export const CIRCLE_DESCRIPTIONS: Record<CircleName, string> = {
