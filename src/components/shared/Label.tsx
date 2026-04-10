@@ -15,11 +15,8 @@ export default function Label({
   return (
     <span
       style={{
-        fontFamily: "Poppins, sans-serif",
-        ...TEXT.label.xs,
-        fontSize: size ?? TEXT.label.xs.fontSize,
-        letterSpacing: "0.12em",
-        textTransform: "uppercase",
+        ...TEXT.eyebrow,
+        fontSize: size ?? TEXT.eyebrow.fontSize,
         color: color ?? (dark ? COLORS.ui.darkMuted : COLORS.ui.lightMuted),
       }}
     >
