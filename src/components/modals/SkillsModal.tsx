@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import CloseButton from "../shared/CloseButton";
 import CircleSimple from "../circle/CircleSimple";
 import { COLORS } from "@/lib/colors";
@@ -64,6 +64,9 @@ const HERO_BLUE = "#1E3A5F";
 const TO_QUADRANT = [1, 2, 3, 0];
 const FROM_QUADRANT = [3, 0, 1, 2];
 
+// Swipe threshold in pixels
+const SWIPE_THRESHOLD = 50;
+
 // ── Component ─────────────────────────────────────────────────────────
 
 interface SkillsModalProps {
@@ -75,6 +78,7 @@ interface SkillsModalProps {
 export default function SkillsModal({ initialStrength = 0, onClose, dark }: SkillsModalProps) {
   const [active, setActive] = useState(initialStrength);
   const [fading, setFading] = useState(false);
+  const touchStartX = useRef<number | null>(null);
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
@@ -96,6 +100,30 @@ export default function SkillsModal({ initialStrength = 0, onClose, dark }: Skil
     go(FROM_QUADRANT[quadrantIndex]);
   };
 
+  // Touch handlers for swipe
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null) return;
+    
+    const touchEndX = e.changedTouches[0].clientX;
+    const diff = touchStartX.current - touchEndX;
+    
+    if (Math.abs(diff) > SWIPE_THRESHOLD) {
+      if (diff > 0) {
+        // Swipe left → next
+        go((active + 1) % STRENGTHS.length);
+      } else {
+        // Swipe right → previous
+        go((active - 1 + STRENGTHS.length) % STRENGTHS.length);
+      }
+    }
+    
+    touchStartX.current = null;
+  };
+
   const s   = STRENGTHS[active];
   const col = s.family === "purple" ? COLORS.purple.hero : COLORS.teal.hero;
 
@@ -113,6 +141,8 @@ export default function SkillsModal({ initialStrength = 0, onClose, dark }: Skil
     >
       <div
         onClick={(e) => e.stopPropagation()}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
         className="flex flex-col md:flex-row rounded-2xl w-full max-w-[720px] max-h-[90vh] overflow-hidden relative"
         style={{ boxShadow: "0 24px 80px rgba(0,0,0,0.4)" }}
       >
