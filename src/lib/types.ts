@@ -1,8 +1,19 @@
 // ═══════════════════════════════════════════════════════════════════════════
-// Report Types — extends @/lib/types
+// Grrow Type Definitions
 // ═══════════════════════════════════════════════════════════════════════════
 
-import type { StrengthFamily, CircleName, KfgCategory } from "@/lib/types";
+// ── Base Types ────────────────────────────────────────────────────────────
+
+export type Circle = "ESSENTIALS" | "EXPLORING" | "INFLUENCING" | "LEADING";
+export type CircleName = Circle;
+export type StrengthName = "Curiosity" | "Collaboration" | "Communication" | "Critical Thinking";
+export type StrengthFamily = "purple" | "teal";
+export type KfgCategory = "keep" | "focus" | "grow";
+export type ScoreState = "Not yet" | "Learning" | "Growing" | "Nailing it";
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Report Types
+// ═══════════════════════════════════════════════════════════════════════════
 
 export type VarianceLevel = "mixed" | "split" | null;
 
@@ -41,7 +52,6 @@ export interface SnapshotData {
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Circle Descriptions — TODO: Move to RING_STAGES in skillsets.ts
-// Flag: RING_STAGES should be renamed to CIRCLE_STAGES
 // ═══════════════════════════════════════════════════════════════════════════
 
 export const CIRCLE_DESCRIPTIONS: Record<CircleName, string> = {
