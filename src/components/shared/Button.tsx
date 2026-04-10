@@ -62,7 +62,7 @@ export function ButtonPrimary({
     ...style,
   };
 
-  const handleHover = (e: React.MouseEvent, lift: boolean) => {
+  const handleHover = (e: React.MouseEvent<HTMLElement>, lift: boolean) => {
     if (disabled) return;
     e.currentTarget.style.transform = lift ? "translateY(-1px)" : "translateY(0)";
     if (shadow) {
@@ -123,7 +123,7 @@ export function ButtonSecondary({
     ...style,
   };
 
-  const handleHover = (e: React.MouseEvent, lift: boolean) => {
+  const handleHover = (e: React.MouseEvent<HTMLElement>, lift: boolean) => {
     if (disabled) return;
     e.currentTarget.style.transform = lift ? "translateY(-1px)" : "translateY(0)";
   };
