@@ -1,0 +1,11 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="64" height="64" rx="14" fill="#4C3FA0" fill-opacity="0.1"/>
+  <g transform="translate(16, 12)">
+    <!-- Clipboard body -->
+    <path d="M4 12 L4 38 Q4 42 8 42 L28 42 Q32 42 32 38 L32 12 Q32 8 28 8 L8 8 Q4 8 4 12 Z" fill="none" stroke="#4C3FA0" stroke-width="1.75"/>
+    <!-- Clip top -->
+    <path d="M12 4 L24 4 Q26 4 26 6 L26 10 L10 10 L10 6 Q10 4 12 4 Z" fill="none" stroke="#4C3FA0" stroke-width="1.75"/>
+    <!-- Checkmark - teal -->
+    <polyline points="12,26 16,30 26,20" fill="none" stroke="#18B99A" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>

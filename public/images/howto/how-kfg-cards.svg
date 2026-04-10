@@ -1,0 +1,19 @@
+<svg viewBox="0 0 420 180" xmlns="http://www.w3.org/2000/svg">
+  <!-- Keep card (purple) -->
+  <rect fill="#D8D4F5" x="10" y="10" width="120" height="160" rx="20"/>
+  <circle cx="70" cy="65" r="28" fill="#4C3FA0"/>
+  <path d="M 55 65 L 65 75 L 85 55" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="70" y="125" fill="#4C3FA0" font-family="Poppins, sans-serif" font-size="18" font-weight="600" text-anchor="middle">Keep</text>
+
+  <!-- Focus card (teal) -->
+  <rect fill="#C8F0EA" x="150" y="10" width="120" height="160" rx="20"/>
+  <circle cx="210" cy="65" r="28" fill="#18B99A"/>
+  <path d="M 195 65 L 205 75 L 225 55" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="210" y="125" fill="#18B99A" font-family="Poppins, sans-serif" font-size="18" font-weight="600" text-anchor="middle">Focus</text>
+
+  <!-- Grow card (purple) -->
+  <rect fill="#D8D4F5" x="290" y="10" width="120" height="160" rx="20"/>
+  <circle cx="350" cy="65" r="28" fill="#4C3FA0"/>
+  <path d="M 335 65 L 345 75 L 365 55" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="350" y="125" fill="#4C3FA0" font-family="Poppins, sans-serif" font-size="18" font-weight="600" text-anchor="middle">Grow</text>
+</svg>

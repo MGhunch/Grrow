@@ -1,0 +1,46 @@
+<svg viewBox="0 0 500 300" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="shadow1" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#4C3FA0" flood-opacity="0.12"/>
+    </filter>
+    <filter id="shadow2" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="6" stdDeviation="12" flood-color="#18B99A" flood-opacity="0.15"/>
+    </filter>
+    <filter id="shadow3" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="16" flood-color="#4C3FA0" flood-opacity="0.18"/>
+    </filter>
+  </defs>
+  
+  <!-- Card 1 - Back (Purple) -->
+  <g transform="translate(70, 25) rotate(-6, 100, 115)">
+    <rect fill="#FFFFFF" x="0" y="0" width="200" height="230" rx="20" filter="url(#shadow1)"/>
+    <rect fill="#E8E5F5" x="20" y="20" width="160" height="60" rx="10"/>
+    <text fill="#4C3FA0" x="36" y="58" font-family="Poppins, sans-serif" font-size="18" font-weight="600">Do you...?</text>
+    <rect fill="#D8D4F5" x="20" y="100" width="40" height="24" rx="5"/>
+    <rect fill="#D8D4F5" x="20" y="132" width="80" height="24" rx="5"/>
+    <rect fill="#D8D4F5" x="20" y="164" width="120" height="24" rx="5"/>
+    <rect fill="#4C3FA0" x="20" y="196" width="160" height="24" rx="5"/>
+  </g>
+  
+  <!-- Card 2 - Middle (Teal) -->
+  <g transform="translate(150, 15)">
+    <rect fill="#FFFFFF" x="0" y="0" width="200" height="230" rx="20" filter="url(#shadow2)"/>
+    <rect fill="#D6F2EC" x="20" y="20" width="160" height="60" rx="10"/>
+    <text fill="#0D9A82" x="36" y="58" font-family="Poppins, sans-serif" font-size="18" font-weight="600">Do you...?</text>
+    <rect fill="#C8F0EA" x="20" y="100" width="40" height="24" rx="5"/>
+    <rect fill="#18B99A" x="20" y="132" width="80" height="24" rx="5"/>
+    <rect fill="#C8F0EA" x="20" y="164" width="120" height="24" rx="5"/>
+    <rect fill="#C8F0EA" x="20" y="196" width="160" height="24" rx="5"/>
+  </g>
+  
+  <!-- Card 3 - Front (Purple) -->
+  <g transform="translate(230, 25) rotate(6, 100, 115)">
+    <rect fill="#FFFFFF" x="0" y="0" width="200" height="230" rx="20" filter="url(#shadow3)"/>
+    <rect fill="#E8E5F5" x="20" y="20" width="160" height="60" rx="10"/>
+    <text fill="#4C3FA0" x="36" y="58" font-family="Poppins, sans-serif" font-size="18" font-weight="600">Do you...?</text>
+    <rect fill="#D8D4F5" x="20" y="100" width="40" height="24" rx="5"/>
+    <rect fill="#D8D4F5" x="20" y="132" width="80" height="24" rx="5"/>
+    <rect fill="#4C3FA0" x="20" y="164" width="120" height="24" rx="5"/>
+    <rect fill="#D8D4F5" x="20" y="196" width="160" height="24" rx="5"/>
+  </g>
+</svg>

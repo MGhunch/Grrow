@@ -1,0 +1,53 @@
+<svg viewBox="0 0 360 230" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="card-shadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="8" stdDeviation="16" flood-color="#4C3FA0" flood-opacity="0.12"/>
+    </filter>
+  </defs>
+
+  <!-- Card background -->
+  <rect fill="#FFFFFF" x="10" y="10" width="340" height="210" rx="20" filter="url(#card-shadow)"/>
+
+  <!-- Two-tone header -->
+  <clipPath id="header-clip">
+    <rect x="10" y="10" width="340" height="54" rx="20" ry="20"/>
+    <rect x="10" y="30" width="340" height="34"/>
+  </clipPath>
+  
+  <g clip-path="url(#header-clip)">
+    <rect fill="#E8E5F5" x="10" y="10" width="170" height="54"/>
+    <rect fill="#D6F2EC" x="180" y="10" width="170" height="54"/>
+  </g>
+
+  <!-- You indicator -->
+  <circle cx="75" cy="37" r="7" fill="#4C3FA0"/>
+  <text x="90" y="42" fill="#4C3FA0" font-family="Poppins, sans-serif" font-size="14" font-weight="600">You</text>
+
+  <!-- Them indicator -->
+  <circle cx="245" cy="37" r="7" fill="none" stroke="#18B99A" stroke-width="2.5"/>
+  <text x="260" y="42" fill="#18B99A" font-family="Poppins, sans-serif" font-size="14" font-weight="600">Them</text>
+
+  <!-- Content area: header ends at 64, card ends at 220. Content height = 156px -->
+  <!-- 3 rows of 20px each = 60px. Remaining = 96px. 4 gaps = 24px each -->
+
+  <!-- Row 1: Question -->
+  <text x="32" y="100" fill="#4C3FA0" font-family="Poppins, sans-serif" font-size="13" font-weight="600">Question</text>
+  <rect fill="#D8D4F5" x="120" y="86" width="70" height="20" rx="4"/>
+  <rect fill="#4C3FA0" x="120" y="86" width="50" height="20" rx="4"/>
+  <rect fill="#C8F0EA" x="200" y="86" width="70" height="20" rx="4"/>
+  <rect fill="#18B99A" x="200" y="86" width="50" height="20" rx="4"/>
+
+  <!-- Row 2: Challenge -->
+  <text x="32" y="144" fill="#4C3FA0" font-family="Poppins, sans-serif" font-size="13" font-weight="600">Challenge</text>
+  <rect fill="#D8D4F5" x="120" y="130" width="70" height="20" rx="4"/>
+  <rect fill="#4C3FA0" x="120" y="130" width="30" height="20" rx="4"/>
+  <rect fill="#C8F0EA" x="200" y="130" width="70" height="20" rx="4"/>
+  <rect fill="#18B99A" x="200" y="130" width="55" height="20" rx="4"/>
+
+  <!-- Row 3: Connect -->
+  <text x="32" y="188" fill="#4C3FA0" font-family="Poppins, sans-serif" font-size="13" font-weight="600">Connect</text>
+  <rect fill="#D8D4F5" x="120" y="174" width="70" height="20" rx="4"/>
+  <rect fill="#4C3FA0" x="120" y="174" width="55" height="20" rx="4"/>
+  <rect fill="#C8F0EA" x="200" y="174" width="70" height="20" rx="4"/>
+  <rect fill="#18B99A" x="200" y="174" width="30" height="20" rx="4"/>
+</svg>

@@ -1,0 +1,65 @@
+<svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="arrow-purple" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M2 2L10 6L2 10" fill="none" stroke="#4C3FA0" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <marker id="arrow-teal" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M2 2L10 6L2 10" fill="none" stroke="#18B99A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <!-- Ring radii: 0→40 (Essentials), 40→80 (Exploring), 80→120 (Influencing), 120→160 (Leading) -->
+  <!-- Centre at 200,200 -->
+
+  <!-- QUADRANT 0: Top-right (Purple family) -->
+  <!-- Ring 0 - Essentials - KEEP highlighted -->
+  <path d="M 200 200 L 200 160 A 40 40 0 0 1 240 200 Z" fill="#4C3FA0" stroke="#FFFFFF" stroke-width="2.5"/>
+  <!-- Ring 1 - Exploring - KEEP highlighted -->
+  <path d="M 200 160 L 200 120 A 80 80 0 0 1 280 200 L 240 200 A 40 40 0 0 0 200 160 Z" fill="#4C3FA0" stroke="#FFFFFF" stroke-width="2.5"/>
+  <!-- Ring 2 - Influencing - light purple -->
+  <path d="M 200 120 L 200 80 A 120 120 0 0 1 320 200 L 280 200 A 80 80 0 0 0 200 120 Z" fill="#E0DCF5" stroke="#FFFFFF" stroke-width="2.5"/>
+  <!-- Ring 3 - Leading - light purple -->
+  <path d="M 200 80 L 200 40 A 160 160 0 0 1 360 200 L 320 200 A 120 120 0 0 0 200 80 Z" fill="#E0DCF5" stroke="#FFFFFF" stroke-width="2.5"/>
+
+  <!-- QUADRANT 1: Bottom-right (Teal family) -->
+  <!-- Ring 0 - Essentials - FOCUS highlighted -->
+  <path d="M 200 200 L 240 200 A 40 40 0 0 1 200 240 Z" fill="#18B99A" stroke="#FFFFFF" stroke-width="2.5"/>
+  <!-- Ring 1 - Exploring - FOCUS highlighted -->
+  <path d="M 240 200 L 280 200 A 80 80 0 0 1 200 280 L 200 240 A 40 40 0 0 0 240 200 Z" fill="#18B99A" stroke="#FFFFFF" stroke-width="2.5"/>
+  <!-- Ring 2 - Influencing - FOCUS highlighted -->
+  <path d="M 280 200 L 320 200 A 120 120 0 0 1 200 320 L 200 280 A 80 80 0 0 0 280 200 Z" fill="#18B99A" stroke="#FFFFFF" stroke-width="2.5"/>
+  <!-- Ring 3 - Leading - light teal -->
+  <path d="M 320 200 L 360 200 A 160 160 0 0 1 200 360 L 200 320 A 120 120 0 0 0 320 200 Z" fill="#C8F0EA" stroke="#FFFFFF" stroke-width="2.5"/>
+
+  <!-- QUADRANT 2: Bottom-left (Purple family) -->
+  <!-- Ring 0 - Essentials - GROW highlighted -->
+  <path d="M 200 200 L 200 240 A 40 40 0 0 1 160 200 Z" fill="#4C3FA0" stroke="#FFFFFF" stroke-width="2.5"/>
+  <!-- Ring 1 - Exploring - GROW highlighted -->
+  <path d="M 200 240 L 200 280 A 80 80 0 0 1 120 200 L 160 200 A 40 40 0 0 0 200 240 Z" fill="#4C3FA0" stroke="#FFFFFF" stroke-width="2.5"/>
+  <!-- Ring 2 - Influencing - GROW highlighted -->
+  <path d="M 200 280 L 200 320 A 120 120 0 0 1 80 200 L 120 200 A 80 80 0 0 0 200 280 Z" fill="#4C3FA0" stroke="#FFFFFF" stroke-width="2.5"/>
+  <!-- Ring 3 - Leading - GROW highlighted -->
+  <path d="M 200 320 L 200 360 A 160 160 0 0 1 40 200 L 80 200 A 120 120 0 0 0 200 320 Z" fill="#4C3FA0" stroke="#FFFFFF" stroke-width="2.5"/>
+
+  <!-- QUADRANT 3: Top-left (Teal family) -->
+  <!-- Ring 0 - Essentials - light teal -->
+  <path d="M 200 200 L 160 200 A 40 40 0 0 1 200 160 Z" fill="#C8F0EA" stroke="#FFFFFF" stroke-width="2.5"/>
+  <!-- Ring 1 - Exploring - light teal -->
+  <path d="M 160 200 L 120 200 A 80 80 0 0 1 200 120 L 200 160 A 40 40 0 0 0 160 200 Z" fill="#C8F0EA" stroke="#FFFFFF" stroke-width="2.5"/>
+  <!-- Ring 2 - Influencing - light teal -->
+  <path d="M 120 200 L 80 200 A 120 120 0 0 1 200 80 L 200 120 A 80 80 0 0 0 120 200 Z" fill="#C8F0EA" stroke="#FFFFFF" stroke-width="2.5"/>
+  <!-- Ring 3 - Leading - light teal -->
+  <path d="M 80 200 L 40 200 A 160 160 0 0 1 200 40 L 200 80 A 120 120 0 0 0 80 200 Z" fill="#C8F0EA" stroke="#FFFFFF" stroke-width="2.5"/>
+
+  <!-- Keep label and arrow - top right -->
+  <text x="320" y="55" fill="#4C3FA0" font-family="Poppins, sans-serif" font-size="18" font-weight="600">Keep</text>
+  <path d="M 310 62 Q 280 95, 255 132" fill="none" stroke="#4C3FA0" stroke-width="2.5" stroke-linecap="round" marker-end="url(#arrow-purple)"/>
+
+  <!-- Focus label and arrow - bottom right -->
+  <text x="295" y="365" fill="#18B99A" font-family="Poppins, sans-serif" font-size="18" font-weight="600">Focus</text>
+  <path d="M 290 355 Q 272 332, 262 302" fill="none" stroke="#18B99A" stroke-width="2.5" stroke-linecap="round" marker-end="url(#arrow-teal)"/>
+
+  <!-- Grow label and arrow - arrowhead meets outer rim -->
+  <text x="12" y="365" fill="#4C3FA0" font-family="Poppins, sans-serif" font-size="18" font-weight="600">Grow</text>
+  <path d="M 65 355 Q 80 338, 90 312" fill="none" stroke="#4C3FA0" stroke-width="2.5" stroke-linecap="round" marker-end="url(#arrow-purple)"/>
+</svg>
