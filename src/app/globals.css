@@ -1,0 +1,170 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Colour Tokens — Single Source of Truth ──────────────────────────
+   All colour values live here. tailwind.config.ts and constants.ts
+   reference these variables — no hardcoded hex values elsewhere.
+   ──────────────────────────────────────────────────────────────────── */
+
+:root {
+  /* Teal family — Collaboration + Communication */
+  --teal-hero:     #18B99A;
+  --teal-dark:     #0D9A82;
+  --teal-not-yet:  #C8F0EA;
+  --teal-learning: #8DE8D8;
+  --teal-growing:  #3DCFB8;
+  --teal-nailing:  #18B99A;
+
+  /* Purple family — Curiosity + Critical Thinking */
+  --purple-hero:     #4C3FA0;
+  --purple-dark:     #3C3289;
+  --purple-not-yet:  #D8D4F5;
+  --purple-learning: #B8B0F0;
+  --purple-growing:  #6558D4;
+  --purple-nailing:  #4C3FA0;
+
+  /* Brand */
+  --hero-blue: #1E3A5F;
+
+  /* UI — Light mode */
+  --bg:          #FFFFFF;
+  --card:        #FFFFFF;
+  --bdr:         #E5E0F5;
+  --sep:         #DDD8F5;
+  --txt:         #1A1525;
+  --muted:       #6B6390;
+  --copy:        #3D3360;
+  --hover:       #F4F1FF;
+  --warm-white:  #FFFDF9;
+  --gray:        #E8E8E8;
+
+  /* UI — Dark mode (ready for .dark class) */
+  --dark-bg:        #0D0B16;
+  --dark-card:      #16122A;
+  --dark-bdr:       #251E40;
+  --dark-sep:       #2E2550;
+  --dark-txt:       #EEE8FF;
+  --dark-muted:     #5A4F7A;
+  --dark-copy:      #9B8FD4;
+  --dark-copy-lift: #C4BCDF;
+  --dark-hover:     #1C1640;
+}
+
+/* ── Base ───────────────────────────────────────────────────────────── */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background: var(--bg);
+  color: var(--txt);
+  font-family: var(--font-poppins), "Poppins", sans-serif;
+  transition: background 0.3s, color 0.3s;
+}
+
+/* ── Animations — Core ──────────────────────────────────────────────── */
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes segFill {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Animations — Modal ────────────────────────────────────────────── */
+
+.animate-fade-in {
+  animation: fadeIn 0.2s ease;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.22s ease;
+}
+
+@keyframes nudge {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+}
+
+.animate-nudge {
+  animation: nudge 0.4s ease;
+}
+
+/* ── Animations — Homepage ──────────────────────────────────────────── */
+
+/* Scrolling ticker */
+@keyframes scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-scroll {
+  animation: scroll 25s linear infinite;
+}
+
+.animate-scroll:hover {
+  animation-play-state: paused;
+}
+
+/* Stagger fade-in for page load */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-up {
+  animation: fade-up 0.6s ease forwards;
+}
+
+.fade-up-delay-1 {
+  animation-delay: 0.1s;
+  opacity: 0;
+}
+
+.fade-up-delay-2 {
+  animation-delay: 0.2s;
+  opacity: 0;
+}
+
+.fade-up-delay-3 {
+  animation-delay: 0.3s;
+  opacity: 0;
+}
+
+/* ── Print ──────────────────────────────────────────────────────────── */
+
+@media print {
+  nav, button { display: none !important; }
+  body { background: white; color: black; }
+}
