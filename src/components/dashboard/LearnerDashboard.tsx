@@ -55,11 +55,7 @@ const MOCK_KFG: KFGSelection[] = [
 ];
 
 const MOCK_REMINDER: Reminder | null = {
-  id: "1",
   type: "checkin",
-  label: "Check-in due",
-  date: "June 2026",
-  actionLabel: "Book now",
 };
 
 const MOCK_NOTES: NoteItem[] = [
@@ -100,10 +96,7 @@ export default function LearnerDashboard() {
       {/* ═══════════════════════════════════════════════════════════════ */}
       {/* REMINDERS */}
       {/* ═══════════════════════════════════════════════════════════════ */}
-      <RemindersBar 
-        reminder={MOCK_REMINDER} 
-        family="teal"
-      />
+      <RemindersBar reminder={MOCK_REMINDER} />
 
       {/* ═══════════════════════════════════════════════════════════════ */}
       {/* KFG ZONE — Gradient wash */}
