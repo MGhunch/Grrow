@@ -120,12 +120,7 @@ export default function LeaderDashboard() {
       {/* ═══════════════════════════════════════════════════════════════ */}
       {/* REMINDERS */}
       {/* ═══════════════════════════════════════════════════════════════ */}
-      <RemindersBar 
-        reminder={null}
-        count={pendingCount}
-        countLabel={pendingCount === 1 ? "check-in to review" : "check-ins to review"}
-        family="purple"
-      />
+      <RemindersBar reminder={null} />
 
       {/* ═══════════════════════════════════════════════════════════════ */}
       {/* TEAM ZONE — Gradient wash */}
