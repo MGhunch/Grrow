@@ -68,18 +68,16 @@ export default function LandingPage() {
           {/* Hero Copy */}
           <div className="max-w-[460px] relative z-10 text-center md:text-left mx-auto md:mx-0 md:ml-16">
             <h1 className="text-hero-xs md:text-hero-m mb-6 text-white">
-              You're already
-              <br />
-              <span className="text-teal-hero">growing.</span>
+              Learning happens.
+              <span className="block mt-4 text-teal-hero">Make it stick.</span>
             </h1>
 
             <p className="text-[17px] leading-[1.7] mb-3 text-dark-copy-lift">
-              Most learning happens on the job. Figuring stuff out, making
-              mistakes, getting feedback and trying again.
+              Everyone learns on the job. Quiet wins, epic fails, stuff we pick up as we go. And then we move on.
             </p>
 
             <p className="text-[17px] font-semibold mb-10 text-white">
-              Let's make it count.
+              Grrow helps join the dots
             </p>
 
             <div className="flex gap-4 justify-center md:justify-start">
@@ -97,19 +95,22 @@ export default function LandingPage() {
       {/* ═══════════════════════════════════════════════════════════════════ */}
       {/* BUILD YOUR SKILLSETS — White section */}
       {/* ═══════════════════════════════════════════════════════════════════ */}
-      <section className="bg-white relative py-16 md:py-20 md:pb-16 md:min-h-[360px]">
+      <section className="bg-white relative py-16 md:pt-24 md:pb-16 md:min-h-[360px]">
         <div className="max-w-[1200px] mx-auto px-6 md:px-8 md:pl-12">
           <div className="max-w-[480px]">
             <h2 className="text-hero-xs md:text-hero-l text-near-black">
-              Build your
+              Build new
               <br />
               skillsets.
             </h2>
-            <h2 className="text-hero-xs md:text-hero-l text-purple-hero mt-4 mb-8 md:mb-10">
+            <h2 className="text-hero-xs md:text-hero-l text-purple-hero mt-4 mb-6">
               Play to your
               <br />
               strengths.
             </h2>
+            <p className="text-base leading-[1.7] text-ui-copy mb-8 md:mb-10 max-w-[300px]">
+              Explore the skills behind the skills. The ones people notice most.
+            </p>
           </div>
 
           {/* Mobile: 2×2 Strength Grid */}
@@ -127,7 +128,7 @@ export default function LandingPage() {
             onClick={() => openSkillsModal(0)}
             className="text-[17px] font-semibold text-teal-hero inline-flex items-center gap-2 bg-transparent border-none cursor-pointer p-0"
           >
-            Explore the strengths
+            Take a look
             <span className="text-xl">›</span>
           </button>
         </div>
@@ -156,7 +157,7 @@ export default function LandingPage() {
               Less paperwork.
             </h2>
             <p className="text-base leading-[1.7] text-ui-copy mb-6 max-w-[400px]">
-              Reflect, connect and chat stuff through. It's not a formal
+              Reflect, connect and chat it through. It's not a formal
               review, just a set of tools to help leaders
               and learners have better conversations.
             </p>
@@ -250,10 +251,10 @@ const STRENGTHS = [
 ];
 
 const CARD_POSITIONS = [
-  { top: 660, right: 120, rotate: -5 },
-  { top: 790, right: 60, rotate: -3 },
-  { top: 920, right: 140, rotate: -4 },
-  { top: 1050, right: 80, rotate: -2 },
+  { top: 675, right: 120, rotate: -5 },
+  { top: 820, right: 60, rotate: -3 },
+  { top: 965, right: 140, rotate: -4 },
+  { top: 1110, right: 80, rotate: -2 },
 ];
 
 const STEPS = [
@@ -307,7 +308,7 @@ function StrengthCard({
   return (
     <div
       onClick={onClick}
-      className={`absolute w-[340px] py-[34px] px-7 rounded-2xl ${bgClass} shadow-[0_12px_40px_rgba(0,0,0,0.25)] pointer-events-auto cursor-pointer transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_16px_48px_rgba(0,0,0,0.3)]`}
+      className={`absolute w-[340px] py-[49px] px-7 rounded-2xl ${bgClass} shadow-[0_12px_40px_rgba(0,0,0,0.25)] pointer-events-auto cursor-pointer transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_16px_48px_rgba(0,0,0,0.3)]`}
       style={{
         top: pos.top,
         right: pos.right,

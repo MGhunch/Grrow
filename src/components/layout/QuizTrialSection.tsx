@@ -14,9 +14,9 @@ interface QuizTrialSectionProps {
 }
 
 export default function QuizTrialSection({
-  headline = "Give it a go",
+  headline = "Try the quiz",
   subline = "Only takes five minutes. No sign up required.",
-  buttonText = "Try the quiz",
+  buttonText = "Let's go",
 }: QuizTrialSectionProps) {
   const { dark } = useTheme();
   const [showModal, setShowModal] = useState(false);
