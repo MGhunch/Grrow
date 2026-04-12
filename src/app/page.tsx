@@ -73,7 +73,7 @@ export default function LandingPage() {
             </h1>
 
             <p className="text-[17px] leading-[1.7] mb-3 text-dark-copy-lift">
-              Everyone learns on the job. Quiet wins, epic fails, stuff we pick up as we go. And then we move on.
+              Everyone learns on the job. Quiet wins, epic fails, stuff we pick up as we go. Then we move on.
             </p>
 
             <p className="text-[17px] font-semibold mb-10 text-white">

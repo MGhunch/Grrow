@@ -6,7 +6,7 @@ import RemindersBar, { Reminder } from "./RemindersBar";
 import KfgSection, { KFGSelection } from "./KfgSection";
 import NoteRow, { NoteItem } from "./NoteRow";
 import { ButtonPrimary, ButtonSecondary } from "../shared/Button";
-import QuizEntryAll from "../quiz/QuizEntryAll";
+import QuizWrap from "../quiz/QuizWrap";
 import QuizEntryCheckin from "../quiz/QuizEntryCheckin";
 import SkillsModal from "../modals/SkillsModal";
 import { useTheme } from "../../lib/ThemeContext";
@@ -162,7 +162,7 @@ export default function LearnerDashboard() {
       {/* MODALS */}
       {/* ═══════════════════════════════════════════════════════════════ */}
       {modal === "review" && (
-        <QuizEntryAll
+        <QuizWrap
           dark={dark}
           onClose={() => setModal(null)}
         />
