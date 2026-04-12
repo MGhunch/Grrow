@@ -4,6 +4,7 @@ import React, { useState, useCallback } from "react";
 import { Check, Sparkles, Network, Waves, GitBranch } from "lucide-react";
 import { COLORS, familyAlpha } from "@/lib/colors";
 import { STRENGTH_FAMILY, getSkillsetsForQuiz } from "@/lib/questions";
+import { STRENGTHS } from "@/lib/skillsets";
 import {
   findGapStrength,
   findStretchStrength,
@@ -28,6 +29,20 @@ const STRENGTH_ICONS: Record<StrengthName, React.ReactNode> = {
   Communication: <Waves size={20} strokeWidth={1.75} />,
   "Critical Thinking": <GitBranch size={20} strokeWidth={1.75} />,
 };
+
+// ── Circle Index (for skillset lookup) ─────────────────────────────────
+
+const CIRCLE_INDEX: Record<Circle, number> = {
+  ESSENTIALS: 0,
+  EXPLORING: 1,
+  INFLUENCING: 2,
+  LEADING: 3,
+};
+
+function getSkillsetName(strength: StrengthName, circle: Circle): string {
+  const s = STRENGTHS.find(st => st.name === strength);
+  return s?.skillsets[CIRCLE_INDEX[circle]]?.name ?? "";
+}
 
 // ── Circle Dot Icon ─────────────────────────────────────────────────────
 
@@ -376,7 +391,7 @@ export default function QuizWrap({ dark, onClose }: Props) {
 
     // Determine button copy
     const hasGapOrStretch = gapInfo || stretchInfo;
-    const buttonCopy = hasGapOrStretch ? "Let's dig deeper" : "See your results";
+    const buttonCopy = hasGapOrStretch ? "Let's dig deeper" : "Keep. Focus. Grow.";
 
     return (
       <div>
@@ -504,6 +519,10 @@ export default function QuizWrap({ dark, onClose }: Props) {
     const bgClass = family === "purple" ? "bg-purple-hero" : "bg-teal-hero";
     const accentColor = family === "purple" ? COLORS.purple.hero : COLORS.teal.hero;
 
+    // Derive skillset names
+    const currentSkillset = getSkillsetName(gapInfo.strength, selectedCircle);
+    const targetSkillset = getSkillsetName(gapInfo.strength, gapInfo.targetCircle);
+
     // Bigger icon for transition screens
     const IconComponent = {
       Curiosity: <Sparkles size={32} strokeWidth={1.75} />,
@@ -517,7 +536,7 @@ export default function QuizWrap({ dark, onClose }: Props) {
         className={`
           ${bgClass}
           flex flex-col items-center justify-center
-          min-h-[560px]
+          h-[620px]
           text-center
           p-6 md:px-10 md:pt-14 md:pb-12
           rounded-2xl
@@ -537,13 +556,12 @@ export default function QuizWrap({ dark, onClose }: Props) {
             {IconComponent}
           </div>
 
-          <h2 className="text-headline-m text-white mb-4">
-            {gapInfo.strength}
-          </h2>
-
+          {/* Two-line copy with skillset names */}
+          <p className="text-std-l text-white/85 leading-relaxed mb-2">
+            You're still building <span className="font-semibold text-white">{currentSkillset}.</span>
+          </p>
           <p className="text-std-l text-white/85 leading-relaxed mb-8">
-            You're still building <span className="font-semibold text-white">{gapInfo.strength}</span>, so let's check in on{" "}
-            <span className="font-semibold text-white">{CIRCLE_DISPLAY[gapInfo.targetCircle]}</span>.
+            Let's check in on <span className="font-semibold text-white">{targetSkillset}.</span>
           </p>
 
           <ButtonPrimary
@@ -570,6 +588,10 @@ export default function QuizWrap({ dark, onClose }: Props) {
     const bgClass = family === "purple" ? "bg-purple-hero" : "bg-teal-hero";
     const accentColor = family === "purple" ? COLORS.purple.hero : COLORS.teal.hero;
 
+    // Derive skillset names
+    const currentSkillset = getSkillsetName(stretchInfo.strength, selectedCircle);
+    const targetSkillset = getSkillsetName(stretchInfo.strength, stretchInfo.targetCircle);
+
     // Bigger icon for transition screens
     const IconComponent = {
       Curiosity: <Sparkles size={32} strokeWidth={1.75} />,
@@ -583,7 +605,7 @@ export default function QuizWrap({ dark, onClose }: Props) {
         className={`
           ${bgClass}
           flex flex-col items-center justify-center
-          min-h-[560px]
+          h-[620px]
           text-center
           p-6 md:px-10 md:pt-14 md:pb-12
           rounded-2xl
@@ -603,13 +625,12 @@ export default function QuizWrap({ dark, onClose }: Props) {
             {IconComponent}
           </div>
 
-          <h2 className="text-headline-m text-white mb-4">
-            {stretchInfo.strength}
-          </h2>
-
+          {/* Two-line copy with skillset names */}
+          <p className="text-std-l text-white/85 leading-relaxed mb-2">
+            You're nailing <span className="font-semibold text-white">{currentSkillset}.</span>
+          </p>
           <p className="text-std-l text-white/85 leading-relaxed mb-8">
-            You're nailing <span className="font-semibold text-white">{stretchInfo.strength}</span> — ready to try{" "}
-            <span className="font-semibold text-white">{CIRCLE_DISPLAY[stretchInfo.targetCircle]}</span>?
+            Ready to try <span className="font-semibold text-white">{targetSkillset}?</span>
           </p>
 
           <ButtonPrimary
@@ -738,7 +759,7 @@ export default function QuizWrap({ dark, onClose }: Props) {
       <div
         onClick={(e) => e.stopPropagation()}
         className={`
-          w-full max-w-[540px] min-h-[560px] max-h-[90vh]
+          w-full max-w-[540px] h-[620px]
           overflow-y-auto rounded-2xl relative
           animate-slide-up
           ${isTransitionPhase ? "" : "p-6 md:px-10 md:pt-14 md:pb-12"}

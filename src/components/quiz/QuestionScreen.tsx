@@ -17,6 +17,79 @@ const OPTIONS: { value: QuizInput; label: string; tooltip: string }[] = [
   { value: 'intuitively', label: 'Intuitively', tooltip: 'You do it without thinking.' },
 ];
 
+// ── Progress Indicator ────────────────────────────────────────────────
+// Three-segment dial around a numbered circle
+
+interface ProgressIndicatorProps {
+  current: 1 | 2 | 3;
+  family: ColourFamily;
+}
+
+function ProgressIndicator({ current, family }: ProgressIndicatorProps) {
+  const size = 32;
+  const strokeWidth = 3;
+  const radius = (size - strokeWidth) / 2;
+  const center = size / 2;
+  
+  const accent = family === 'purple' ? COLORS.purple.hero : COLORS.teal.hero;
+  const track = family === 'purple' ? COLORS.purple.notYet : COLORS.teal.notYet;
+  
+  // Three segments, each 100° with 20° gaps
+  // Starting from top (-90°), going clockwise
+  const segmentAngle = 100;
+  const gapAngle = 20;
+  const segments = [0, 1, 2];
+  
+  // Convert angle to radians
+  const toRad = (deg: number) => (deg * Math.PI) / 180;
+  
+  // Generate arc path for a segment
+  const arcPath = (startAngle: number, endAngle: number) => {
+    const startRad = toRad(startAngle - 90); // -90 to start from top
+    const endRad = toRad(endAngle - 90);
+    
+    const x1 = center + radius * Math.cos(startRad);
+    const y1 = center + radius * Math.sin(startRad);
+    const x2 = center + radius * Math.cos(endRad);
+    const y2 = center + radius * Math.sin(endRad);
+    
+    const largeArc = endAngle - startAngle > 180 ? 1 : 0;
+    
+    return `M ${x1} ${y1} A ${radius} ${radius} 0 ${largeArc} 1 ${x2} ${y2}`;
+  };
+  
+  return (
+    <div className="relative shrink-0" style={{ width: size, height: size }}>
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+        {segments.map((i) => {
+          const startAngle = i * (segmentAngle + gapAngle);
+          const endAngle = startAngle + segmentAngle;
+          const isFilled = i < current;
+          
+          return (
+            <path
+              key={i}
+              d={arcPath(startAngle, endAngle)}
+              fill="none"
+              stroke={isFilled ? accent : track}
+              strokeWidth={strokeWidth}
+              strokeLinecap="round"
+            />
+          );
+        })}
+      </svg>
+      
+      {/* Number in center */}
+      <div 
+        className="absolute inset-0 flex items-center justify-center text-bold-s"
+        style={{ color: accent }}
+      >
+        {current}
+      </div>
+    </div>
+  );
+}
+
 // ── Props ─────────────────────────────────────────────────────────────
 
 interface QuestionScreenProps {
@@ -42,6 +115,7 @@ export function QuestionScreen({
   strength,
   skillset,
   circle,
+  questionInSkillset,
   totalAnswered,
   totalQuestions,
   selectedAnswer,
@@ -86,8 +160,12 @@ export function QuestionScreen({
         <CloseButton onClose={onClose} accentColor={accent} size={28} />
       </div>
 
-      {/* ── Header — just skillset name ─────────────────────────────── */}
-      <div className="mb-6 mt-4">
+      {/* ── Header — progress indicator + skillset name ─────────────── */}
+      <div className="flex items-center gap-3 mb-6 mt-4">
+        <ProgressIndicator 
+          current={questionInSkillset as 1 | 2 | 3} 
+          family={family} 
+        />
         <h2 className="text-headline-m" style={{ color: accent }}>
           {skillset}
         </h2>
