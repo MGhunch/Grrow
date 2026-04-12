@@ -5,7 +5,7 @@ import { useTheme } from "../../lib/ThemeContext";
 import { COLORS, whiteAlpha } from "@/lib/colors";
 import { TEXT } from "@/lib/typography";
 import { ButtonPrimary } from "../shared/Button";
-import QuizEntryAll from "../quiz/QuizEntryAll";
+import QuizWrap from "../quiz/QuizWrap";
 
 interface QuizTrialSectionProps {
   headline?: string;
@@ -57,7 +57,7 @@ export default function QuizTrialSection({
       </div>
 
       {showModal && (
-        <QuizEntryAll dark={dark} onClose={() => setShowModal(false)} />
+        <QuizWrap dark={dark} onClose={() => setShowModal(false)} />
       )}
     </>
   );

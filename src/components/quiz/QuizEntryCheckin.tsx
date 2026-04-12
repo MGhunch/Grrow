@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useCallback } from "react";
-import { Check } from "lucide-react";
+import React, { useState, useCallback } from "react";
+import { Check, Sparkles, Network, Waves, GitBranch } from "lucide-react";
 import { COLORS, familyAlpha } from "@/lib/colors";
-import { getSkillsetByName, type Skillset } from "../../lib/questions";
+import { getSkillsetByName, STRENGTH_FAMILY, type Skillset } from "../../lib/questions";
 import CloseButton from "../shared/CloseButton";
 import { ButtonPrimary } from "../shared/Button";
 import StrengthIcon from "../shared/StrengthIcon";
@@ -39,13 +39,7 @@ interface Props {
   onSwitchToReview?: () => void;
 }
 
-// ── KFG Colours ───────────────────────────────────────────────────────
-
-const KFG_COLORS = {
-  keep:  COLORS.teal.hero,
-  focus: COLORS.purple.hero,
-  grow:  COLORS.purple.growing,
-};
+// ── KFG Labels ───────────────────────────────────────────────────────
 
 const KFG_LABELS: Record<string, string> = {
   keep: "KEEP",
@@ -146,41 +140,44 @@ export default function QuizEntryCheckin({
           Check in
         </h2>
 
-        {/* KFG cards */}
+        {/* KFG rows — gray background, family pills */}
         <div className="flex flex-col gap-2.5 mb-8">
           {kfgSelections.map((k) => {
-            const famColor = k.family === "teal" ? COLORS.teal.hero : COLORS.purple.hero;
-            const cardBg = k.family === "teal"
-              ? (dark ? familyAlpha("teal", "wash", "dark") : "#F0FBF8")
-              : (dark ? familyAlpha("purple", "wash", "dark") : "#F5F3FF");
+            const accent = k.family === "teal" ? COLORS.teal.hero : COLORS.purple.hero;
+            const paleBg = k.family === "teal" ? COLORS.teal.notYet : COLORS.purple.notYet;
 
             return (
               <div
                 key={k.category}
-                className="flex items-center gap-4 px-5 py-4 rounded-xl"
-                style={{
-                  background: cardBg,
-                  border: `1.5px solid ${famColor}`,
-                }}
+                className="flex items-center gap-3 px-4 py-3.5 rounded-xl"
+                style={{ background: "#F9F8FC" }}
               >
-                <StrengthIcon
-                  strength={k.strength as StrengthName}
-                  size="md"
-                  variant="shaded"
-                />
+                {/* Icon in pale family circle */}
+                <div
+                  className="w-11 h-11 rounded-full flex items-center justify-center shrink-0"
+                  style={{ background: paleBg }}
+                >
+                  <StrengthIcon
+                    strength={k.strength as StrengthName}
+                    size="sm"
+                    variant="shaded"
+                  />
+                </div>
 
+                {/* Skillset name */}
                 <span
-                  className="text-bold-l flex-1"
-                  style={{ color: famColor }}
+                  className="text-bold-m md:text-bold-l flex-1"
+                  style={{ color: accent }}
                 >
                   {k.skillset}
                 </span>
 
+                {/* Category pill in family color */}
                 <span
-                  className="text-[10px] font-semibold tracking-wide px-2.5 py-0.5 rounded-full shrink-0"
+                  className="text-[10px] font-semibold tracking-wide px-2.5 py-1 rounded-full shrink-0"
                   style={{
                     color: COLORS.ui.white,
-                    background: KFG_COLORS[k.category],
+                    background: accent,
                   }}
                 >
                   {KFG_LABELS[k.category]}
@@ -215,6 +212,13 @@ export default function QuizEntryCheckin({
 
   // ── Complete Phase ──────────────────────────────────────────────────
 
+  const STRENGTH_ICONS: Record<StrengthName, React.ReactNode> = {
+    Curiosity: <Sparkles size={20} strokeWidth={2} />,
+    Collaboration: <Network size={20} strokeWidth={2} />,
+    Communication: <Waves size={20} strokeWidth={2} />,
+    "Critical Thinking": <GitBranch size={20} strokeWidth={2} />,
+  };
+
   const renderComplete = () => (
     <div>
       {/* Header with tick */}
@@ -227,26 +231,24 @@ export default function QuizEntryCheckin({
         </h2>
       </div>
 
-      {/* Result cards */}
+      {/* Result cards — gray rows with progress rings */}
       <div className="flex flex-col gap-2.5 mb-8">
         {results?.map((r, i) => {
           const category = getKfgCategory(r.skillset.skillset);
-          const isPurple = r.skillset.family === "purple";
+          const family = STRENGTH_FAMILY[r.skillset.strength as StrengthName];
+          const isPurple = family === "purple";
           const accent = isPurple ? COLORS.purple.hero : COLORS.teal.hero;
-          const cardBg = isPurple
-            ? (dark ? familyAlpha("purple", "wash", "dark") : "#F5F3FF")
-            : (dark ? familyAlpha("teal", "wash", "dark") : "#F0FBF8");
-          const trackColor = isPurple ? COLORS.purple.notYet : COLORS.teal.notYet;
+          const paleBg = isPurple ? COLORS.purple.notYet : COLORS.teal.notYet;
 
-          const { label, fill } = getScoreState(r.score);
+          const { label } = getScoreState(r.score);
 
-          const getBarColor = () => {
-            const colors = isPurple ? COLORS.purple : COLORS.teal;
-            if (r.score <= 25) return colors.notYet;
-            if (r.score <= 50) return colors.learning;
-            if (r.score <= 75) return colors.growing;
-            return colors.hero;
-          };
+          // Ring progress calculation
+          const ringSize = 44;
+          const sw = 4;
+          const radius = (ringSize - sw) / 2;
+          const circumference = 2 * Math.PI * radius;
+          const progress = r.score / 100;
+          const strokeDashoffset = circumference * (1 - progress);
 
           const delta = r.previousScore !== undefined ? r.score - r.previousScore : null;
           const deltaText = delta !== null
@@ -259,42 +261,69 @@ export default function QuizEntryCheckin({
           return (
             <div
               key={i}
-              className="flex items-center gap-4 px-5 py-4 rounded-xl"
-              style={{
-                background: cardBg,
-                border: `1.5px solid ${accent}`,
-              }}
+              className="flex items-center gap-3 px-4 py-3.5 rounded-xl"
+              style={{ background: "#F9F8FC" }}
             >
-              <StrengthIcon
-                strength={r.skillset.strength as StrengthName}
-                size="md"
-                variant="shaded"
-              />
+              {/* Icon with progress ring */}
+              <div
+                className="relative shrink-0"
+                style={{ width: ringSize, height: ringSize }}
+              >
+                {/* Pale family background circle */}
+                <div 
+                  className="absolute inset-0 rounded-full"
+                  style={{ background: paleBg }}
+                />
+                {/* Progress ring */}
+                <svg
+                  width={ringSize}
+                  height={ringSize}
+                  viewBox={`0 0 ${ringSize} ${ringSize}`}
+                  className="-rotate-90 relative"
+                >
+                  {/* Track */}
+                  <circle
+                    cx={ringSize / 2}
+                    cy={ringSize / 2}
+                    r={radius}
+                    fill="none"
+                    stroke={COLORS.ui.gray}
+                    strokeWidth={sw}
+                  />
+                  {/* Progress fill */}
+                  <circle
+                    cx={ringSize / 2}
+                    cy={ringSize / 2}
+                    r={radius}
+                    fill="none"
+                    stroke={accent}
+                    strokeWidth={sw}
+                    strokeLinecap="round"
+                    strokeDasharray={circumference}
+                    strokeDashoffset={strokeDashoffset}
+                    className="transition-[stroke-dashoffset] duration-300 ease-out"
+                  />
+                </svg>
+                {/* Icon */}
+                <div
+                  className="absolute inset-0 flex items-center justify-center"
+                  style={{ color: accent }}
+                >
+                  {STRENGTH_ICONS[r.skillset.strength as StrengthName]}
+                </div>
+              </div>
 
+              {/* Skillset name */}
               <span
-                className="text-bold-l flex-1"
+                className="text-bold-m md:text-bold-l flex-1"
                 style={{ color: accent }}
               >
                 {r.skillset.skillset}
               </span>
 
-              {/* Score bar */}
-              <div
-                className="w-[50px] h-1.5 rounded-sm overflow-hidden shrink-0"
-                style={{ background: trackColor }}
-              >
-                <div
-                  className="h-full rounded-sm transition-[width] duration-300 ease-out"
-                  style={{
-                    width: `${fill}%`,
-                    background: getBarColor(),
-                  }}
-                />
-              </div>
-
               {/* Score label */}
               <span
-                className="text-bold-s min-w-[65px] text-right"
+                className="text-bold-s shrink-0"
                 style={{ color: accent }}
               >
                 {label}
@@ -303,20 +332,20 @@ export default function QuizEntryCheckin({
               {/* Delta */}
               {deltaText && (
                 <span
-                  className="text-tooltip font-semibold min-w-7 text-right"
+                  className="text-tooltip font-semibold min-w-7 text-right shrink-0"
                   style={{ color: deltaColor }}
                 >
                   {deltaText}
                 </span>
               )}
 
-              {/* KFG pill */}
+              {/* KFG pill in family color */}
               {category && (
                 <span
-                  className="text-[10px] font-semibold tracking-wide px-2.5 py-0.5 rounded-full shrink-0"
+                  className="text-[10px] font-semibold tracking-wide px-2.5 py-1 rounded-full shrink-0"
                   style={{
                     color: COLORS.ui.white,
-                    background: KFG_COLORS[category],
+                    background: accent,
                   }}
                 >
                   {KFG_LABELS[category]}

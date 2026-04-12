@@ -173,7 +173,7 @@ export default function CircleSimple({
   function getOpacity(si: number): number {
     if (isGhost) return 1; // Ghost variant doesn't dim quadrants
     if (activeQuadrant === null) return 1;
-    return activeQuadrant === si ? 1 : 0.5;
+    return activeQuadrant === si ? 1 : 0.75;
   }
 
   // Render a single segment
