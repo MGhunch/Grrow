@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Dot Hub</title>
+    <meta name="theme-color" content="#ED1C24">
+    <link rel="apple-touch-icon" href="images/favicon.png">
+    <link rel="icon" type="image/png" href="images/favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="modal-system.css">
+    <link rel="stylesheet" href="updateModal.css">
+    <link rel="stylesheet" href="newJobModal.css">
+    <link rel="stylesheet" href="authOverlay.css">
+    <link rel="stylesheet" href="welcomeModal.css">
+</head>
+<body class="logged-out">
+    <!-- Toast notifications -->
+    <div class="toast" id="toast"></div>
+
+
+    <!-- ===== AUTH OVERLAY (Phase D) ===== -->
+    <div class="auth-overlay" id="auth-overlay">
+        <div class="auth-stage">
+
+            <!-- SIGN IN — default cold-arrival face -->
+            <div class="auth-face" data-face="signin">
+                <div class="auth-graphic">
+                    <img src="images/Dotandhello.png" alt="Hello from Dot">
+                </div>
+                <div class="auth-content">
+                    <h1 class="auth-headline">What's your email?</h1>
+                    <p class="auth-sub">We'll flick you a link so you can get into it.</p>
+                    <form class="auth-form" id="auth-signin-form">
+                        <input type="email" class="auth-input" id="auth-email" placeholder="your@email.com" autocomplete="email">
+                        <button type="submit" class="auth-button" id="auth-submit">Get a link</button>
+                    </form>
+                    <p class="auth-error" id="auth-error"></p>
+                </div>
+            </div>
+
+            <!-- SENT — magic link sent, check inbox -->
+            <div class="auth-face" data-face="sent" hidden>
+                <div class="auth-graphic">
+                    <img src="images/Dotandhello.png" alt="Hello from Dot">
+                </div>
+                <div class="auth-content">
+                    <h1 class="auth-headline">Check your inbox</h1>
+                    <p class="auth-sub">Your magic link is on its way ✨</p>
+                    <p class="auth-retry">No dice? Check your spam or <a href="#" id="auth-try-again">try again</a></p>
+                </div>
+            </div>
+
+            <!-- EXPIRED — magic link no longer valid -->
+            <div class="auth-face" data-face="expired" hidden>
+                <div class="auth-graphic">
+                    <img src="images/dot_oops.png" alt="Oops from Dot">
+                </div>
+                <div class="auth-content">
+                    <h1 class="auth-headline">Was that an old link?</h1>
+                    <p class="auth-sub">Try again to get a shiny new one.</p>
+                    <form class="auth-form" id="auth-expired-form">
+                        <input type="email" class="auth-input" id="auth-email-expired" placeholder="your@email.com" autocomplete="email">
+                        <button type="submit" class="auth-button">Get a link</button>
+                    </form>
+                    <p class="auth-error" id="auth-error-expired"></p>
+                </div>
+            </div>
+
+            <div class="auth-ai2">
+                <img src="images/ai2-logo.png" alt="ai²">
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ===== WELCOME MODAL (Phase D) =====
+         Opens after magic-link verify (?welcome=1) over the destination
+         view. Sits while initial data loads. Get started enables when
+         data lands, dismisses the modal. -->
+    <div class="modal-overlay" id="welcome-modal-overlay">
+        <div class="modal-shell welcome-modal-shell">
+            <div class="welcome-modal-body">
+                <div class="welcome-modal-graphic">
+                    <img src="images/Dotandhello.png" alt="Hello from Dot">
+                </div>
+                <div class="welcome-modal-content">
+                    <p class="welcome-modal-headline">Hi <span id="welcome-modal-firstname">there</span></p>
+                    <p class="welcome-modal-sub">Just lining up your stuff. Won't be a sec.</p>
+                    <button type="button" class="modal-button-filled welcome-modal-button" id="welcome-modal-button" disabled>
+                        <span class="welcome-modal-loading-label">Digging data<span class="dot"></span><span class="dot"></span><span class="dot"></span></span>
+                        <span class="welcome-modal-ready-label">Get started</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ===== PHONE LAYOUT (Mobile <900px) ===== -->
+    <div class="phone-container" id="phone-container">
+        <!-- Phone Header -->
+        <header class="phone-header">
+            <a class="header-logo" id="phone-home-btn">
+                <img src="images/Askdot-header.png" alt="Ask Dot" class="header-logo-img">
+            </a>
+            <button class="hamburger" id="phone-hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <nav class="dropdown" id="phone-dropdown">
+                <div class="dropdown-item" data-view="wip">
+                    <svg class="chevron-icon-right" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg> WIP
+                </div>
+                <div class="dropdown-item" data-view="tracker">
+                    <svg class="chevron-icon-right" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg> Tracker
+                </div>
+                <div class="dropdown-item" data-view="todo">
+                    <svg class="chevron-icon-right" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg> Todo
+                </div>
+                <div class="dropdown-item hunch-only" data-view="settings">
+                    <svg class="chevron-icon-right" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg> Settings
+                </div>
+                <div class="dropdown-item muted" data-action="signout">
+                    <svg class="chevron-icon-right" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg> Sign out
+                </div>
+            </nav>
+        </header>
+        
+        <div class="overlay" id="phone-overlay"></div>
+        
+        <!-- Phone Login: replaced by auth-overlay (Phase D) -->
+        
+        <!-- Phone WIP View -->
+        <div class="phone-wip" id="phone-wip">
+            <div class="phone-wip-controls">
+                <div class="custom-dropdown" id="phone-wip-client-dropdown">
+                    <button class="custom-dropdown-trigger" id="phone-wip-client-trigger">
+                        <span>All Clients</span>
+                        <svg class="chevron-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#ED1C24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                    </button>
+                    <div class="custom-dropdown-menu" id="phone-wip-client-menu">
+                        <div class="custom-dropdown-option selected" data-value="all">All Clients</div>
+                    </div>
+                </div>
+            </div>
+            <div class="phone-wip-content" id="phone-wip-content">
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <p>Loading jobs...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Phone Tracker Message -->
+        <div class="phone-desktop-only" id="phone-tracker-message">
+            <img src="images/Robot.png" alt="Dot">
+            <h2>Best on desktop</h2>
+            <p>Tracker is designed for bigger screens.</p>
+            <button class="pill-btn" onclick="goHome()">Back</button>
+        </div>
+
+        <!-- Phone Todo -->
+        <div class="phone-todo" id="phone-todo">
+            <div class="todo-content" id="phone-todo-content">
+                <div class="loading"><div class="loading-spinner"></div><p>Loading todos...</p></div>
+            </div>
+        </div>
+
+        <!-- Phone Settings Message -->
+        <div class="phone-desktop-only" id="phone-settings-message">
+            <img src="images/Robot.png" alt="Dot">
+            <h2>Best on desktop</h2>
+            <p>Settings is designed for bigger screens.</p>
+            <button class="pill-btn" onclick="goHome()">Back</button>
+        </div>
+    </div>
+
+    <!-- ===== DESKTOP LAYOUT (900px+) ===== -->
+    <div class="desktop-container" id="desktop-container">
+        <!-- Desktop Header -->
+        <header class="desktop-header">
+            <div class="header-left">
+                <a class="header-logo" id="desktop-home-btn">
+                    <img src="images/Askdot-header.png" alt="Ask Dot" class="header-logo-img">
+                </a>
+                <nav class="header-nav">
+                    <button class="nav-tab" data-view="wip">WIP</button>
+                    <button class="nav-tab" data-view="tracker">Tracker</button>
+                    <button class="nav-tab" data-view="todo">Todo</button>
+                </nav>
+            </div>
+            <div class="header-right">
+                <div class="user-dropdown">
+                    <button class="user-dropdown-trigger" id="user-dropdown-trigger">
+                        <span id="user-display-name">User</span>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </button>
+                    <div class="user-dropdown-menu" id="user-dropdown-menu">
+                        <div class="user-dropdown-item hunch-only" data-view="settings">Settings</div>
+                        <div class="user-dropdown-item" data-action="signout">Sign out</div>
+                    </div>
+                </div>
+                <img src="images/dot-ai2-logo.png" alt="ai&#178;" class="header-ai-logo">
+            </div>
+        </header>
+
+        <!-- Desktop Main Content -->
+        <main class="desktop-main">
+            <!-- Desktop Login: replaced by auth-overlay (Phase D) -->
+
+            <!-- ===== WIP VIEW ===== -->
+            <section class="view view-wip" id="view-wip">
+                <div class="wip-controls">
+                    <div class="custom-dropdown" id="wip-client-dropdown">
+                        <button class="custom-dropdown-trigger" id="wip-client-trigger">
+                            <span>All Clients</span>
+                            <svg class="chevron-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#ED1C24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                        </button>
+                        <div class="custom-dropdown-menu" id="wip-client-menu">
+                            <div class="custom-dropdown-option selected" data-value="all">All Clients</div>
+                        </div>
+                    </div>
+                    <button class="wip-pdf-btn" id="wip-pdf-btn" onclick="openWipPdf()">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+                        PDF
+                    </button>
+                </div>
+                <div class="wip-content" id="wip-content">
+                    <div class="loading">
+                        <div class="loading-spinner"></div>
+                        <p>Loading jobs...</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===== TRACKER VIEW ===== -->
+            <section class="view view-tracker" id="view-tracker">
+                <div class="tracker-controls">
+                    <div class="controls-left">
+                        <div class="custom-dropdown" id="tracker-client-dropdown">
+                            <button class="custom-dropdown-trigger" id="tracker-client-trigger">
+                                <span>Select Client</span>
+                                <svg class="chevron-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#ED1C24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                            </button>
+                            <div class="custom-dropdown-menu" id="tracker-client-menu"></div>
+                        </div>
+                        <div class="custom-dropdown" id="tracker-month-dropdown">
+                            <button class="custom-dropdown-trigger" id="tracker-month-trigger">
+                                <span>January</span>
+                                <svg class="chevron-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#ED1C24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                            </button>
+                            <div class="custom-dropdown-menu" id="tracker-month-menu">
+                                <!-- Populated dynamically by tracker.js -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mode-toggle">
+                        <span class="mode-label active" id="tracker-mode-spend">Month</span>
+                        <label class="mode-switch">
+                            <input type="checkbox" id="tracker-mode-switch">
+                            <span class="mode-switch-slider"></span>
+                        </label>
+                        <span class="mode-label" id="tracker-mode-pipeline">Quarter</span>
+                    </div>
+                </div>
+                <div class="tracker-content" id="tracker-content">
+                    <div class="loading">
+                        <div class="loading-spinner"></div>
+                        <p>Loading tracker...</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===== TODO VIEW ===== -->
+            <section class="view view-todo" id="view-todo">
+                <div class="todo-content" id="todo-content">
+                    <div class="loading">
+                        <div class="loading-spinner"></div>
+                        <p>Loading todos...</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===== SETTINGS VIEW (Hunch-only — placeholder, future phase) ===== -->
+            <section class="view view-settings" id="view-settings">
+                <div class="settings-container">
+                    <h1 class="settings-title">SETTINGS</h1>
+                    <p class="settings-sub">Tools to manage clients, people and access. Coming soon.</p>
+                    <ul class="settings-list">
+                        <li class="settings-item disabled">
+                            <span class="settings-item-label">Permissions</span>
+                            <span class="settings-item-tag">Coming soon</span>
+                        </li>
+                        <li class="settings-item disabled">
+                            <span class="settings-item-label">Add a client</span>
+                            <span class="settings-item-tag">Coming soon</span>
+                        </li>
+                        <li class="settings-item disabled">
+                            <span class="settings-item-label">Add a person</span>
+                            <span class="settings-item-tag">Coming soon</span>
+                        </li>
+                        <li class="settings-item disabled">
+                            <span class="settings-item-label">Remove a client</span>
+                            <span class="settings-item-tag">Coming soon</span>
+                        </li>
+                        <li class="settings-item disabled">
+                            <span class="settings-item-label">Change budget</span>
+                            <span class="settings-item-tag">Coming soon</span>
+                        </li>
+                        <li class="settings-item disabled">
+                            <span class="settings-item-label">Manage devices</span>
+                            <span class="settings-item-tag">Coming soon</span>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- ===== JOB BAG VIEW ===== -->
+
+
+    <!-- New Job Modal -->
+    <div class="modal-overlay new-job-modal-overlay" id="new-job-modal-overlay" role="dialog" aria-modal="true" aria-label="New job">
+        <div class="modal-shell new-job-modal" id="new-job-modal">
+            <button class="modal-close new-job-modal-close" id="new-job-modal-close" aria-label="Close">&times;</button>
+
+            <!-- PICKER VIEW -->
+            <div class="new-job-picker" id="new-job-picker">
+                <div id="new-job-picker-clients"></div>
+            </div>
+
+            <!-- POPULATED VIEW -->
+            <div class="new-job-populated" id="new-job-populated" style="display:none">
+                <div class="modal-header new-job-header">
+                    <div class="new-job-header-row">
+                        <img class="new-job-header-logo" id="new-job-header-logo" src="images/logos/Unknown.png" alt="">
+                        <div class="new-job-header-text">
+                            <input class="new-job-hero-input" id="new-job-hero-input" type="text" placeholder="New job name" maxlength="80" autocomplete="off">
+                            <div class="modal-eyebrow new-job-meta" id="new-job-meta"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-body new-job-body">
+                    <!-- CLIENT (owner) -->
+                    <div class="modal-eyebrow new-job-section-eyebrow">CLIENT</div>
+                    <div class="custom-dropdown new-job-dropdown new-job-owner-dropdown">
+                        <button class="modal-soft-box new-job-owner-trigger empty" id="new-job-owner-trigger" type="button">
+                            <span id="new-job-owner-label">Choose project owner...</span>
+                            <span class="chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span>
+                        </button>
+                        <div class="custom-dropdown-menu" id="new-job-owner-menu"></div>
+                    </div>
+
+                    <!-- DESCRIPTION -->
+                    <div class="modal-eyebrow new-job-section-eyebrow">DESCRIPTION</div>
+                    <div class="modal-soft-box new-job-description-area">
+                        <textarea id="new-job-description-input" placeholder="What's it about?" rows="2"></textarea>
+                    </div>
+
+                    <!-- DUE + LIVE CHIPS -->
+                    <div class="new-job-chip-row">
+                        <button class="modal-chip new-job-chip empty" id="new-job-due-chip" type="button">
+                            <span id="new-job-due-label">Set due</span>
+                            <span class="chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span>
+                        </button>
+                        <input type="date" class="new-job-hidden-input" id="new-job-due-input">
+
+                        <div class="custom-dropdown new-job-dropdown">
+                            <button class="modal-chip new-job-chip empty" id="new-job-live-chip" type="button">
+                                <span id="new-job-live-label">Live · TBC</span>
+                                <span class="chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span>
+                            </button>
+                            <div class="custom-dropdown-menu" id="new-job-live-menu"></div>
+                        </div>
+                    </div>
+
+                    <!-- TRACKER -->
+                    <div class="new-job-tracker">
+                        <div class="modal-eyebrow new-job-section-eyebrow">TRACKER</div>
+
+                        <div class="new-job-spend-row">
+                            <div class="modal-soft-pill modal-spend-pill new-job-spend-amount" id="new-job-spend-amount">
+                                <span class="dollar">$</span>
+                                <input class="modal-spend-input new-job-spend-input" id="new-job-spend-input" type="text" inputmode="numeric" placeholder="0" value="5,000">
+                            </div>
+                            <div class="custom-dropdown new-job-dropdown">
+                                <button class="modal-chip new-job-chip" id="new-job-month-chip" type="button">
+                                    <span id="new-job-month-label">May</span>
+                                    <span class="chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span>
+                                </button>
+                                <div class="custom-dropdown-menu" id="new-job-month-menu"></div>
+                            </div>
+                            <button class="modal-tick-row new-job-tick-row on" id="new-job-ballpark" type="button">
+                                <span class="modal-tick new-job-tick">
+                                    <svg viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg">
+                                        <polyline points="2,6 5,9 10,3"></polyline>
+                                    </svg>
+                                </span>
+                                <span class="modal-tick-label new-job-tick-label">Ballpark</span>
+                            </button>
+                        </div>
+
+                        <div class="modal-soft-box new-job-notes-box">
+                            <textarea id="new-job-notes-input" placeholder="What's the spend for?" rows="1"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- WITH CLIENT + INCOMING -->
+                    <div class="new-job-bottom-strip">
+                        <button class="modal-toggle-pair new-job-toggle-pair" id="new-job-with-client" type="button">
+                            <span class="modal-toggle new-job-toggle" id="new-job-with-client-toggle"></span>
+                            <span class="modal-toggle-label new-job-toggle-label">WITH CLIENT</span>
+                        </button>
+
+                        <button class="modal-toggle-pair new-job-toggle-pair on" id="new-job-incoming" type="button">
+                            <span class="modal-toggle new-job-toggle on" id="new-job-incoming-toggle"></span>
+                            <span class="modal-toggle-label new-job-toggle-label">INCOMING</span>
+                        </button>
+                    </div>
+
+                    <button class="modal-button-filled new-job-submit" id="new-job-submit" type="button">CREATE JOB</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Todo Edit/Add Modal ===== -->
+    <div class="job-modal-overlay" id="todo-edit-modal">
+        <div class="job-modal todo-modal">
+            <div class="job-modal-header">
+                <div class="job-modal-header-left">
+                    <img class="job-modal-logo" id="todo-modal-logo" src="images/logos/Unknown.png" alt="">
+                    <h2 class="job-modal-title" id="todo-modal-title">Edit Todo</h2>
+                </div>
+                <button class="job-modal-close" onclick="closeTodoModal()">&times;</button>
+            </div>
+
+            <div class="job-modal-body">
+                <!-- Title -->
+                <div class="job-form-group">
+                    <label class="job-form-label">Title <span class="required">*</span></label>
+                    <input type="text" class="job-form-input" id="todo-modal-title-input" placeholder="What needs doing?">
+                </div>
+
+                <!-- Client -->
+                <div class="job-form-group">
+                    <label class="job-form-label">Client</label>
+                    <div class="custom-dropdown form-dropdown" id="todo-modal-client-dropdown">
+                        <button type="button" class="custom-dropdown-trigger form-dropdown-trigger" id="todo-modal-client-trigger" onclick="toggleTodoModalDropdown('client')">
+                            <span>None</span>
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#ED1C24" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+                        </button>
+                        <div class="custom-dropdown-menu" id="todo-modal-client-menu">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bucket -->
+                <div class="job-form-group">
+                    <label class="job-form-label">Bucket</label>
+                    <div class="custom-dropdown form-dropdown" id="todo-modal-bucket-dropdown">
+                        <button type="button" class="custom-dropdown-trigger form-dropdown-trigger" id="todo-modal-bucket-trigger" onclick="toggleTodoModalDropdown('bucket')">
+                            <span>Other</span>
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#ED1C24" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+                        </button>
+                        <div class="custom-dropdown-menu" id="todo-modal-bucket-menu">
+                            <div class="custom-dropdown-option" data-value="CLIENTS" onclick="selectTodoModalOption('bucket', 'CLIENTS', 'Client Work')">Client Work</div>
+                            <div class="custom-dropdown-option selected" data-value="OTHER" onclick="selectTodoModalOption('bucket', 'OTHER', 'Other')">Other</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Urgent toggle -->
+                <div class="todo-modal-urgent-row">
+                    <span class="job-form-label">Urgent</span>
+                    <label class="toggle">
+                        <input type="checkbox" id="todo-modal-urgent">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="job-modal-footer">
+                <button class="todo-modal-delete-btn" id="todo-modal-delete-btn" onclick="deleteTodoFromModal()">Delete</button>
+                <div class="todo-modal-actions">
+                    <button class="job-btn job-btn-secondary" onclick="closeTodoModal()">Cancel</button>
+                    <button class="job-btn job-btn-primary" id="todo-modal-save-btn" onclick="saveTodoFromModal()">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Coming Soon Modal -->
+    <div class="coming-soon-modal-overlay" id="coming-soon-modal">
+        <div class="coming-soon-modal">
+            <button class="coming-soon-close" onclick="closeComingSoonModal()">&times;</button>
+            <img src="images/dot-sitting.png" alt="Dot" class="coming-soon-img">
+            <p class="coming-soon-text" id="coming-soon-text">Coming soon</p>
+        </div>
+    </div>
+
+
+    <!-- WIP Email Modal -->
+    <div class="job-modal-overlay" id="wip-email-modal">
+        <div class="job-modal files-modal">
+            <div class="job-modal-header">
+                <div class="job-modal-header-left">
+                    <img class="job-modal-logo" id="wip-email-modal-logo" src="images/logos/Unknown.png" alt="">
+                </div>
+                <button class="job-modal-close" onclick="closeWipEmailModal()">&times;</button>
+            </div>
+            <div class="job-modal-body">
+                <!-- Client dropdown -->
+                <div class="job-form-group">
+                    <label class="job-form-label">Client</label>
+                    <div class="custom-dropdown form-dropdown" id="wip-email-client-dropdown">
+                        <button type="button" class="custom-dropdown-trigger form-dropdown-trigger" id="wip-email-client-trigger" onclick="toggleWipEmailDropdown()">
+                            <span>Select client...</span>
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#ED1C24" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+                        </button>
+                        <div class="custom-dropdown-menu" id="wip-email-client-menu"></div>
+                    </div>
+                </div>
+
+                <!-- People checkboxes -->
+                <div class="job-form-group" id="wip-email-people-group" style="display: none;">
+                    <label class="job-form-label">Send to</label>
+                    <div id="wip-email-people-list" style="max-height: 200px; overflow-y: auto;"></div>
+                </div>
+
+                <!-- Custom note -->
+                <div class="job-form-group" id="wip-email-note-group" style="display: none;">
+                    <label class="job-form-label">Add a note (optional)</label>
+                    <textarea class="job-form-input job-form-textarea" id="wip-email-note" placeholder="That project with the chickens needs some eggs..." rows="2"></textarea>
+                </div>
+            </div>
+            <div class="job-modal-footer" id="wip-email-footer" style="display: none;">
+                <button class="job-btn job-btn-primary" id="wip-email-send-btn" onclick="sendWipEmail()">SEND WIP</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script src="tracker.js"></script>
+    <script src="todolist.js"></script>
+    <script src="clientPicker.js"></script>
+    <script src="jobPicker.js"></script>
+    <script src="updateModal.js"></script>
+    <script src="newJobModal.js"></script>
+    <script src="welcomeModal.js"></script>
+    <script src="plusComponent.js"></script>
+
+
+    <!-- Plus Component (floating button — visible on every page) -->
+    <div class="plus-backdrop" id="plus-backdrop" aria-hidden="true"></div>
+    <div class="plus-dock" id="plus-dock">
+        <!-- Menu pills: appear above the FAB when dock has .open class.
+             DOM order top-to-bottom (New Job, Update).
+             Stagger animation reversed so bottom pill (closest to FAB) animates in first. -->
+        <div class="plus-actions" id="plus-actions" role="menu">
+            <button class="plus-pill" data-action="new-job" role="menuitem">
+                <svg class="chevron-icon-right" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg>
+                <span>New Job</span>
+            </button>
+            <button class="plus-pill" data-action="update" role="menuitem">
+                <svg class="chevron-icon-right" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg>
+                <span>Update</span>
+            </button>
+        </div>
+        <button class="plus-button" id="plus-button" aria-label="Open menu" aria-expanded="false">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+        </button>
+    </div>
+
+    <!-- Plus Component — phone bar (only renders on phone, hidden on desktop via CSS).
+         Bar = white rectangle across the bottom. Cradle = a centred SVG that draws
+         a flat-then-arc-then-flat silhouette in white, sitting on top of the bar
+         where the FAB's lower hemisphere tucks in. -->
+    <div class="plus-bar" id="plus-bar" aria-hidden="true">
+        <svg class="plus-bar-cradle" viewBox="0 0 128 40" xmlns="http://www.w3.org/2000/svg">
+            <!-- Path: flat for 32px, arc up and over (radius 32 = FAB radius 28 + 4 cushion), flat for 32px.
+                 The cradle width is 128px; the arc spans the middle 64px. -->
+            <path d="M 0,40 L 0,32 L 32,32 A 32,32 0 0 1 96,32 L 128,32 L 128,40 Z" fill="#ffffff"/>
+        </svg>
+    </div>
+
+    <!-- ===== UPDATE MODAL =====
+         Unified Update modal — Plus menu's Update action lands here.
+         Cold entry shows picker (clients → jobs); hot entry skips to populated view.
+         See updateModal.js / updateModal.css. -->
+    <div class="modal-overlay update-modal-overlay" id="update-modal-overlay" role="dialog" aria-modal="true" aria-label="Update job">
+        <div class="modal-shell update-modal" id="update-modal">
+            <button class="modal-close update-modal-close" id="update-modal-close" aria-label="Close">×</button>
+
+            <!-- PICKER VIEW -->
+            <div class="update-modal-picker" id="update-modal-picker">
+                <div id="update-modal-picker-clients"></div>
+                <div id="update-modal-picker-jobs" hidden></div>
+            </div>
+
+            <!-- POPULATED VIEW -->
+            <div class="update-modal-populated" id="update-modal-populated" style="display:none">
+                <div class="modal-header update-modal-header" id="update-modal-header">
+                    <div class="update-modal-header-row">
+                        <img class="update-modal-header-logo" id="update-modal-header-logo" src="images/logos/Unknown.png" alt="">
+                        <div class="update-modal-header-text">
+                            <div class="modal-hero update-modal-hero" id="update-modal-hero"></div>
+                            <div class="update-modal-description-area" id="update-modal-description-area">
+                                <div class="update-modal-description" id="update-modal-description"></div>
+                                <textarea id="update-modal-description-input" placeholder="What's this job about?" rows="2"></textarea>
+                            </div>
+                            <div class="modal-eyebrow update-modal-meta" id="update-modal-meta"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-body update-modal-body">
+                    <div class="modal-eyebrow update-modal-section-eyebrow">UPDATE</div>
+                    <div class="modal-soft-box update-modal-update-area" id="update-modal-update-area">
+                        <div class="update-modal-update-display" id="update-modal-update-display"></div>
+                        <textarea id="update-modal-update-field" placeholder="What's happening?" rows="2"></textarea>
+                    </div>
+
+                    <div class="update-modal-chip-row">
+                        <button class="modal-chip update-modal-chip" id="update-modal-due-chip" type="button">
+                            <span id="update-modal-due-label">Set due</span>
+                            <span class="chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span>
+                        </button>
+                        <input type="date" class="update-modal-hidden-input" id="update-modal-due-input">
+
+                        <div class="custom-dropdown update-modal-dropdown">
+                            <button class="modal-chip update-modal-chip" id="update-modal-live-chip" type="button">
+                                <span id="update-modal-live-label">Live · TBC</span>
+                                <span class="chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span>
+                            </button>
+                            <div class="custom-dropdown-menu" id="update-modal-live-menu"></div>
+                        </div>
+                    </div>
+
+                    <div class="update-modal-tracker">
+                        <div class="modal-eyebrow update-modal-section-eyebrow">TRACKER</div>
+
+                        <div class="update-modal-spend-row">
+                            <div class="modal-soft-pill modal-spend-pill update-modal-spend-amount" id="update-modal-spend-amount">
+                                <span class="dollar">$</span>
+                                <input class="modal-spend-input update-modal-spend-input" id="update-modal-spend-input" type="text" inputmode="numeric" placeholder="0">
+                            </div>
+                            <div class="custom-dropdown update-modal-dropdown">
+                                <button class="modal-chip update-modal-chip" id="update-modal-month-chip" type="button">
+                                    <span id="update-modal-month-label">May</span>
+                                    <span class="chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></span>
+                                </button>
+                                <div class="custom-dropdown-menu" id="update-modal-month-menu"></div>
+                            </div>
+                            <button class="modal-tick-row update-modal-tick-row" id="update-modal-ballpark" type="button">
+                                <span class="modal-tick update-modal-tick">
+                                    <svg viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg">
+                                        <polyline points="2,6 5,9 10,3"></polyline>
+                                    </svg>
+                                </span>
+                                <span class="modal-tick-label update-modal-tick-label">Ballpark</span>
+                            </button>
+                        </div>
+                        <div class="update-modal-to-date hidden" id="update-modal-to-date"></div>
+
+                        <div class="modal-soft-box update-modal-notes-box">
+                            <textarea id="update-modal-tracker-notes" placeholder="What's the spend for?" rows="1"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="update-modal-bottom-strip">
+                        <button class="modal-toggle-pair update-modal-toggle-pair" id="update-modal-with-client" type="button">
+                            <span class="modal-toggle update-modal-toggle" id="update-modal-with-client-toggle"></span>
+                            <span class="modal-toggle-label update-modal-toggle-label">WITH CLIENT</span>
+                        </button>
+
+                        <div class="custom-dropdown update-modal-dropdown update-modal-dropdown-up">
+                            <button class="update-modal-status" id="update-modal-status" type="button">
+                                <span class="update-modal-status-indicator" id="update-modal-status-indicator"></span>
+                                <span id="update-modal-status-label">IN PROGRESS</span>
+                            </button>
+                            <div class="custom-dropdown-menu" id="update-modal-status-menu"></div>
+                        </div>
+                    </div>
+
+                    <button class="modal-button-filled update-modal-submit" id="update-modal-submit">UPDATE</button>
+                </div>
+            </div>
+
+            <!-- COMPLETION VIEW -->
+            <div class="update-modal-completion" id="update-modal-completion" style="display:none">
+                <div class="modal-eyebrow update-modal-completion-eyebrow">
+                    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 8 7 12 13 4"/></svg>
+                    <span>UPDATED</span>
+                </div>
+                <div class="modal-hero update-modal-completion-title" id="update-modal-completion-title"></div>
+
+                <div class="modal-eyebrow update-modal-completion-section-eyebrow">NEXT UP</div>
+
+                <div class="update-modal-completion-next-card" id="update-modal-completion-next-card">
+                    <button class="update-modal-completion-next-main" id="update-modal-completion-next-main" type="button">
+                        <img class="update-modal-completion-next-logo" id="update-modal-completion-next-logo" src="images/logos/Unknown.png" alt="">
+                        <div class="update-modal-completion-next-content">
+                            <div class="update-modal-completion-next-kicker" id="update-modal-completion-next-kicker"></div>
+                            <div class="update-modal-completion-next-name" id="update-modal-completion-next-name"></div>
+                        </div>
+                    </button>
+                    <button class="update-modal-completion-next-toggle" id="update-modal-completion-next-toggle" type="button" aria-label="Show other jobs" hidden>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+                    </button>
+                </div>
+
+                <div class="update-modal-completion-menu" id="update-modal-completion-menu" hidden></div>
+
+                <button class="modal-button-filled update-modal-completion-btn-filled" id="update-modal-completion-btn-done" type="button">DONE</button>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
