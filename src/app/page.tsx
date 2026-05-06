@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { Sparkles, Network, Waves, GitBranch, Compass, MessageCircle, Target, TrendingUp } from "lucide-react";
 import GrrowCircle from "../components/circle/GrrowCircle";
-import QuizWrap from "../components/quiz/QuizWrap";
+import ExplorerEntry from "../components/quiz/ExplorerEntry";
 import QuizTrialSection from "../components/layout/QuizTrialSection";
 import SkillsModal from "../components/modals/SkillsModal";
 import { ButtonPrimary, ButtonSecondary } from "../components/shared/Button";
@@ -200,7 +200,7 @@ export default function LandingPage() {
 
       {/* Quiz Modal */}
       {showQuizModal && (
-        <QuizWrap dark={dark} onClose={() => setShowQuizModal(false)} />
+        <ExplorerEntry dark={dark} onClose={() => setShowQuizModal(false)} />
       )}
 
       {/* Skills Modal */}
