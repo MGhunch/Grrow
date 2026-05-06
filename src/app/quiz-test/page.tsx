@@ -7,12 +7,14 @@ import { STRENGTH_FAMILY } from "@/lib/questions";
 import CloseButton from "../../components/shared/CloseButton";
 import { ButtonPrimary, ButtonSecondary } from "../../components/shared/Button";
 import CircleSimple from "../../components/circle/CircleSimple";
+import { QuizTestWelcome } from "../../components/quiz/QuizTestWelcome";
 import type { Circle, StrengthName } from "@/lib/types";
 import type { ColourFamily } from "@/lib/scoring";
 
 // ── Test Page ─────────────────────────────────────────────────────────────
 
 type TestPhase = 
+  | "welcome"
   | "selecting"
   | "transition"
   | "question"
@@ -22,12 +24,13 @@ type TestPhase =
   | "kfg";
 
 const PHASE_GROUPS = [
-  { label: "Entry", phases: ["selecting"] },
+  { label: "Entry", phases: ["welcome", "selecting"] },
   { label: "Quiz", phases: ["transition", "question"] },
   { label: "Results", phases: ["circleResults", "gapTransition", "stretchTransition", "kfg"] },
 ];
 
 const PHASE_LABELS: Record<TestPhase, string> = {
+  welcome: "Welcome",
   selecting: "Circle Selection",
   transition: "Transition",
   question: "Question",
@@ -41,11 +44,12 @@ export default function QuizTestPage() {
   const [phase, setPhase] = useState<TestPhase>("selecting");
 
   // Full bleed phases (coloured backgrounds)
-  const isFullBleed = ["transition", "gapTransition", "stretchTransition"].includes(phase);
+  const isFullBleed = ["welcome", "transition", "gapTransition", "stretchTransition"].includes(phase);
 
   const renderPhase = (viewport: "mobile" | "desktop") => {
     const key = `${phase}-${viewport}`;
     switch (phase) {
+      case "welcome": return <QuizTestWelcome key={key} />;
       case "selecting": return <MockSelecting key={key} />;
       case "transition": return <MockTransition key={key} />;
       case "question": return <MockQuestion key={key} />;
