@@ -84,6 +84,7 @@ interface SkillsetResult {
 interface Props {
   dark: boolean;
   onClose: () => void;
+  initialCircle?: Circle;
 }
 
 // ── Ring data ────────────────────────────────────────────────────────────
@@ -127,9 +128,9 @@ const RING_DESCRIPTIONS: {
 
 // ── Component ────────────────────────────────────────────────────────────
 
-export default function QuizWrap({ dark, onClose }: Props) {
-  const [phase, setPhase] = useState<Phase>("selecting");
-  const [selectedCircle, setSelectedCircle] = useState<Circle>("ESSENTIALS");
+export default function QuizWrap({ dark, onClose, initialCircle }: Props) {
+  const [phase, setPhase] = useState<Phase>(initialCircle ? "quizzing" : "selecting");
+  const [selectedCircle, setSelectedCircle] = useState<Circle>(initialCircle ?? "ESSENTIALS");
   const [baseResults, setBaseResults] = useState<SkillsetResult[] | null>(null);
   const [gapResults, setGapResults] = useState<SkillsetResult[] | null>(null);
   const [stretchResults, setStretchResults] = useState<SkillsetResult[] | null>(null);
