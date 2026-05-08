@@ -5,7 +5,7 @@ import { Check, ChevronDown, Sparkles, Network, Waves, GitBranch } from "lucide-
 import { COLORS, familyAlpha } from "@/lib/colors";
 import { STRENGTH_FAMILY, getSkillsetsForQuiz } from "@/lib/questions";
 import { STRENGTHS } from "@/lib/skillsets";
-import { composeFeedback } from "@/lib/feedback/compose";
+import { composeAllFeedback } from "@/lib/feedback/compose";
 import {
   findGapStrength,
   findStretchStrength,
@@ -158,19 +158,16 @@ export default function QuizWrap({ dark, onClose, initialCircle, testMode = fals
   const fullBleedBg = quizPhaseInfo ? FAMILY_ACCENT[quizPhaseInfo.family] : COLORS.purple.hero;
 
   // ── Composed feedback blurbs for the circle-results screen ─────────────
-  // Computed once per result set so the random opener picks don't reshuffle
-  // on every re-render.
+  // One call covers all four cards. Cards sharing a state get unique
+  // openers; the random pick freezes per result set so re-renders don't
+  // reshuffle the wording.
   const blurbs = useMemo(() => {
     if (!baseResults) return [];
-    const allStates = baseResults.map(r => getScoreState(r.score).label);
-    return baseResults.map(r =>
-      composeFeedback({
-        circle: selectedCircle,
-        skillset: r.skillset.skillset,
-        state: getScoreState(r.score).label,
-        allStates,
-      })
-    );
+    const cards = baseResults.map(r => ({
+      skillset: r.skillset.skillset,
+      state: getScoreState(r.score).label,
+    }));
+    return composeAllFeedback({ circle: selectedCircle, cards });
   }, [baseResults, selectedCircle]);
 
   // ── Handlers ───────────────────────────────────────────────────────────
@@ -449,7 +446,7 @@ export default function QuizWrap({ dark, onClose, initialCircle, testMode = fals
     return (
       <div>
         {/* Header with tick */}
-        <div className="flex items-center gap-4 mb-7">
+        <div className="flex items-center gap-4 mb-3">
           <div className="w-10 h-10 rounded-full bg-teal-hero flex items-center justify-center shrink-0">
             <Check size={22} strokeWidth={3} color={COLORS.ui.white} />
           </div>
@@ -457,6 +454,11 @@ export default function QuizWrap({ dark, onClose, initialCircle, testMode = fals
             {CIRCLE_DISPLAY[selectedCircle]}
           </h2>
         </div>
+
+        {/* Helper line — primes the cards as tappable */}
+        <p className="text-std-m text-ui-muted leading-relaxed mb-6 m-0">
+          Here's where you're at. Tap for more.
+        </p>
 
         {/* Result cards — tap to expand and reveal blurb */}
         <div className="flex flex-col gap-2.5 mb-7">
