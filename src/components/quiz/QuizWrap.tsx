@@ -580,7 +580,7 @@ export default function QuizWrap({ dark, onClose, initialCircle, testMode = fals
                 >
                   <div className="px-4 pb-4 pt-1">
                     <p className="text-std-m text-ui-muted leading-relaxed m-0">
-                      <em>{blurb.context}</em> {blurb.body}
+                      {blurb.context} {blurb.body}
                     </p>
                   </div>
                 </div>
