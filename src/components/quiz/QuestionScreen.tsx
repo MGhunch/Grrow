@@ -153,7 +153,7 @@ export function QuestionScreen({
   };
 
   return (
-    <div className="flex flex-col flex-1">
+    <div className="flex flex-col h-full">
 
       {/* Close button — same family */}
       <div className="absolute top-5 right-5 z-10">
@@ -172,7 +172,8 @@ export function QuestionScreen({
       </div>
 
       {/* ── Question + answers ──────────────────────────────────────── */}
-      <div className="flex-1 flex flex-col">
+      {/* min-h-0 lets this section absorb the bar's growth without pushing the footer */}
+      <div className="flex-1 flex flex-col min-h-0">
         {/* Question text — standard weight, family dark */}
         <p 
           className="text-std-l leading-relaxed mb-6" 
@@ -218,15 +219,6 @@ export function QuestionScreen({
             );
           })}
         </div>
-
-        {/* Reserve tooltip height when nothing selected — keeps modal stable on first select */}
-        <div
-          aria-hidden
-          className="transition-[height] duration-150 ease-out"
-          style={{ height: selectedAnswer === null ? 22 : 0 }}
-        />
-
-        <div className="mb-8" />
       </div>
 
       {/* ── Footer ───────────────────────────────────────────────────── */}
