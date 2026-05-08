@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useState, useCallback } from "react";
-import { Check, Sparkles, Network, Waves, GitBranch } from "lucide-react";
+import React, { useState, useMemo, useCallback } from "react";
+import { Check, ChevronDown, Sparkles, Network, Waves, GitBranch } from "lucide-react";
 import { COLORS, familyAlpha } from "@/lib/colors";
 import { STRENGTH_FAMILY, getSkillsetsForQuiz } from "@/lib/questions";
 import { STRENGTHS } from "@/lib/skillsets";
+import { composeFeedback } from "@/lib/feedback/compose";
 import {
   findGapStrength,
   findStretchStrength,
@@ -85,6 +86,8 @@ interface Props {
   dark: boolean;
   onClose: () => void;
   initialCircle?: Circle;
+  /** When true, the Snapshot ends at the results screen with a "Try a different circle" CTA that returns to the chooser, instead of routing into gap/stretch/KFG. Used by ExplorerEntry on the home page. */
+  testMode?: boolean;
 }
 
 // ── Ring data ────────────────────────────────────────────────────────────
@@ -128,7 +131,7 @@ const RING_DESCRIPTIONS: {
 
 // ── Component ────────────────────────────────────────────────────────────
 
-export default function QuizWrap({ dark, onClose, initialCircle }: Props) {
+export default function QuizWrap({ dark, onClose, initialCircle, testMode = false }: Props) {
   const [phase, setPhase] = useState<Phase>(initialCircle ? "quizzing" : "selecting");
   const [selectedCircle, setSelectedCircle] = useState<Circle>(initialCircle ?? "ESSENTIALS");
   const [baseResults, setBaseResults] = useState<SkillsetResult[] | null>(null);
@@ -138,6 +141,7 @@ export default function QuizWrap({ dark, onClose, initialCircle }: Props) {
   const [hoveredHelp, setHoveredHelp] = useState<number | null>(null);
   const [quizPhaseInfo, setQuizPhaseInfo] = useState<PhaseInfo | null>(null);
   const [showNudge, setShowNudge] = useState(false);
+  const [expandedCards, setExpandedCards] = useState<Set<number>>(new Set());
   
   // Gap/stretch tracking
   const [gapInfo, setGapInfo] = useState<GapStretchResult | null>(null);
@@ -152,6 +156,22 @@ export default function QuizWrap({ dark, onClose, initialCircle }: Props) {
     (phase === "quizzing" || phase === "gapQuiz" || phase === "stretchQuiz") && 
     quizPhaseInfo?.phase === "transition";
   const fullBleedBg = quizPhaseInfo ? FAMILY_ACCENT[quizPhaseInfo.family] : COLORS.purple.hero;
+
+  // ── Composed feedback blurbs for the circle-results screen ─────────────
+  // Computed once per result set so the random opener picks don't reshuffle
+  // on every re-render.
+  const blurbs = useMemo(() => {
+    if (!baseResults) return [];
+    const allStates = baseResults.map(r => getScoreState(r.score).label);
+    return baseResults.map(r =>
+      composeFeedback({
+        circle: selectedCircle,
+        skillset: r.skillset.skillset,
+        state: getScoreState(r.score).label,
+        allStates,
+      })
+    );
+  }, [baseResults, selectedCircle]);
 
   // ── Handlers ───────────────────────────────────────────────────────────
 
@@ -233,6 +253,32 @@ export default function QuizWrap({ dark, onClose, initialCircle }: Props) {
     } else {
       calculateAndShowKFG();
     }
+  };
+
+  const handleTryAnotherCircle = () => {
+    // Reset all quiz state and return to the chooser
+    setBaseResults(null);
+    setGapResults(null);
+    setStretchResults(null);
+    setGapInfo(null);
+    setStretchInfo(null);
+    setKfgSuggestion(null);
+    setSelectedRing(null);
+    setQuizPhaseInfo(null);
+    setExpandedCards(new Set());
+    setPhase("selecting");
+  };
+
+  const toggleCard = (i: number) => {
+    setExpandedCards(prev => {
+      const next = new Set(prev);
+      if (next.has(i)) {
+        next.delete(i);
+      } else {
+        next.add(i);
+      }
+      return next;
+    });
   };
 
   const handleGapTransitionContinue = () => {
@@ -390,9 +436,15 @@ export default function QuizWrap({ dark, onClose, initialCircle }: Props) {
   const renderCircleResults = () => {
     if (!baseResults) return null;
 
-    // Determine button copy
+    // Terminal CTA — test mode caps the journey at this screen and offers
+    // another circle. Authed mode flows on into gap/stretch/KFG.
     const hasGapOrStretch = gapInfo || stretchInfo;
-    const buttonCopy = hasGapOrStretch ? "Let's dig deeper" : "Keep. Focus. Grow.";
+    const buttonCopy = testMode
+      ? "Try a different circle"
+      : (hasGapOrStretch ? "Let's dig deeper" : "Keep. Focus. Grow.");
+    const buttonHandler = testMode
+      ? handleTryAnotherCircle
+      : handleCircleResultsContinue;
 
     return (
       <div>
@@ -406,19 +458,21 @@ export default function QuizWrap({ dark, onClose, initialCircle }: Props) {
           </h2>
         </div>
 
-        {/* Result cards — gray rows, same-family progress rings */}
+        {/* Result cards — tap to expand and reveal blurb */}
         <div className="flex flex-col gap-2.5 mb-7">
           {baseResults.map((r, i) => {
             const strength = r.skillset.strength as StrengthName;
             const family: ColourFamily = STRENGTH_FAMILY[strength];
             const isPurple = family === "purple";
-            
+
             // Family colours
             const accent = isPurple ? COLORS.purple.hero : COLORS.teal.hero;
             const paleBg = isPurple ? COLORS.purple.notYet : COLORS.teal.notYet;
-            
+
             const { label } = getScoreState(r.score);
-            
+            const isExpanded = expandedCards.has(i);
+            const blurb = blurbs[i];
+
             // Ring progress calculation
             const ringSize = 44;
             const sw = 4;
@@ -430,72 +484,106 @@ export default function QuizWrap({ dark, onClose, initialCircle }: Props) {
             return (
               <div
                 key={i}
-                className="flex items-center gap-3 px-4 py-3.5 rounded-xl"
+                className="rounded-xl overflow-hidden"
                 style={{ background: "#F9F8FC" }}
               >
-                {/* Icon with progress ring */}
-                <div
-                  className="relative shrink-0"
-                  style={{ width: ringSize, height: ringSize }}
+                {/* Tappable row */}
+                <button
+                  type="button"
+                  onClick={() => toggleCard(i)}
+                  aria-expanded={isExpanded}
+                  className="flex items-center gap-3 px-4 py-3.5 w-full text-left cursor-pointer"
                 >
-                  {/* Pale family background circle */}
-                  <div 
-                    className="absolute inset-0 rounded-full"
-                    style={{ background: paleBg }}
-                  />
-                  {/* Progress ring */}
-                  <svg
-                    width={ringSize}
-                    height={ringSize}
-                    viewBox={`0 0 ${ringSize} ${ringSize}`}
-                    className="-rotate-90 relative"
-                  >
-                    {/* Track */}
-                    <circle
-                      cx={ringSize / 2}
-                      cy={ringSize / 2}
-                      r={radius}
-                      fill="none"
-                      stroke={COLORS.ui.gray}
-                      strokeWidth={sw}
-                    />
-                    {/* Progress fill — family hero */}
-                    <circle
-                      cx={ringSize / 2}
-                      cy={ringSize / 2}
-                      r={radius}
-                      fill="none"
-                      stroke={accent}
-                      strokeWidth={sw}
-                      strokeLinecap="round"
-                      strokeDasharray={circumference}
-                      strokeDashoffset={strokeDashoffset}
-                      className="transition-[stroke-dashoffset] duration-300 ease-out"
-                    />
-                  </svg>
-                  {/* Icon — family hero */}
+                  {/* Icon with progress ring */}
                   <div
-                    className="absolute inset-0 flex items-center justify-center"
-                    style={{ color: accent }}
+                    className="relative shrink-0"
+                    style={{ width: ringSize, height: ringSize }}
                   >
-                    {STRENGTH_ICONS[strength]}
+                    {/* Pale family background circle */}
+                    <div
+                      className="absolute inset-0 rounded-full"
+                      style={{ background: paleBg }}
+                    />
+                    {/* Progress ring */}
+                    <svg
+                      width={ringSize}
+                      height={ringSize}
+                      viewBox={`0 0 ${ringSize} ${ringSize}`}
+                      className="-rotate-90 relative"
+                    >
+                      {/* Track */}
+                      <circle
+                        cx={ringSize / 2}
+                        cy={ringSize / 2}
+                        r={radius}
+                        fill="none"
+                        stroke={COLORS.ui.gray}
+                        strokeWidth={sw}
+                      />
+                      {/* Progress fill — family hero */}
+                      <circle
+                        cx={ringSize / 2}
+                        cy={ringSize / 2}
+                        r={radius}
+                        fill="none"
+                        stroke={accent}
+                        strokeWidth={sw}
+                        strokeLinecap="round"
+                        strokeDasharray={circumference}
+                        strokeDashoffset={strokeDashoffset}
+                        className="transition-[stroke-dashoffset] duration-300 ease-out"
+                      />
+                    </svg>
+                    {/* Icon — family hero */}
+                    <div
+                      className="absolute inset-0 flex items-center justify-center"
+                      style={{ color: accent }}
+                    >
+                      {STRENGTH_ICONS[strength]}
+                    </div>
+                  </div>
+
+                  {/* Skillset name + strength */}
+                  <div className="flex-1 min-w-0">
+                    <span className="text-bold-m md:text-bold-l block truncate" style={{ color: accent }}>
+                      {r.skillset.skillset}
+                    </span>
+                    <span className="text-std-s text-ui-muted truncate block">
+                      {r.skillset.strength}
+                    </span>
+                  </div>
+
+                  {/* State label */}
+                  <span className="text-bold-s md:text-bold-m shrink-0" style={{ color: accent }}>
+                    {label}
+                  </span>
+
+                  {/* Chevron — rotates when expanded */}
+                  <ChevronDown
+                    size={18}
+                    strokeWidth={2}
+                    className="shrink-0 transition-transform duration-200 ease-out"
+                    style={{
+                      color: accent,
+                      transform: isExpanded ? "rotate(180deg)" : "rotate(0deg)",
+                    }}
+                  />
+                </button>
+
+                {/* Expandable blurb */}
+                <div
+                  className="overflow-hidden transition-[max-height,opacity] duration-200 ease-out"
+                  style={{
+                    maxHeight: isExpanded ? "320px" : "0px",
+                    opacity: isExpanded ? 1 : 0,
+                  }}
+                >
+                  <div className="px-4 pb-4 pt-1">
+                    <p className="text-std-m text-ui-muted leading-relaxed m-0">
+                      <em>{blurb.context}</em> {blurb.body}
+                    </p>
                   </div>
                 </div>
-
-                {/* Skillset name + strength */}
-                <div className="flex-1 min-w-0">
-                  <span className="text-bold-m md:text-bold-l block truncate" style={{ color: accent }}>
-                    {r.skillset.skillset}
-                  </span>
-                  <span className="text-std-s text-ui-muted truncate block">
-                    {r.skillset.strength}
-                  </span>
-                </div>
-
-                {/* State label */}
-                <span className="text-bold-s md:text-bold-m shrink-0" style={{ color: accent }}>
-                  {label}
-                </span>
               </div>
             );
           })}
@@ -503,7 +591,7 @@ export default function QuizWrap({ dark, onClose, initialCircle }: Props) {
 
         {/* Button */}
         <div className="flex justify-center">
-          <ButtonPrimary color="teal" onClick={handleCircleResultsContinue}>
+          <ButtonPrimary color="teal" onClick={buttonHandler}>
             {buttonCopy}
           </ButtonPrimary>
         </div>

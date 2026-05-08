@@ -2,7 +2,7 @@
 // Single source of truth for modal sizing across all quiz screens
 
 import { COLORS } from "@/lib/colors";
-import type { StrengthName, Circle } from '@/lib/types';
+import type { StrengthName, Circle, ScoreState } from '@/lib/types';
 import type { ColourFamily } from '@/lib/scoring';
 
 // ── Modal Contract ────────────────────────────────────────────────────
@@ -58,7 +58,7 @@ export const STRENGTH_TO_SEGMENT: Record<StrengthName, number> = {
 
 // ── Score Helpers ─────────────────────────────────────────────────────
 
-export function getScoreState(score: number): { label: string; fill: number } {
+export function getScoreState(score: number): { label: ScoreState; fill: number } {
   if (score <= 25) return { label: "Not yet", fill: 25 };
   if (score <= 50) return { label: "Learning", fill: 50 };
   if (score <= 75) return { label: "Growing", fill: 75 };

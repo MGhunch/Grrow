@@ -29,12 +29,15 @@ export default function ExplorerEntry({ dark, onClose }: ExplorerEntryProps) {
 
   // Once locate's reveal fires, hand off to QuizWrap with the circle preset.
   // QuizWrap handles its own modal frame from this point.
+  // testMode={true} caps the flow at the results screen with a "Try a different
+  // circle" CTA — the full gap/stretch/KFG journey is reserved for signed-in users.
   if (locateComplete) {
     return (
       <QuizWrap
         dark={dark}
         onClose={onClose}
         initialCircle={selectedCircle}
+        testMode
       />
     );
   }
