@@ -305,11 +305,17 @@ function ResultScreen({ onClose, circle, onStart }: ResultScreenProps) {
 }
 
 // ── ResultCircle — inline SVG circle for the reveal showcase ──────────────
-// Four concentric rings + cross. Active ring solid purple hero, others
-// ghosted to notYet pale. Cross is white — barely visible against pale rings,
-// pops on the active ring (showing the four strengths quadrant inside it).
+// Four concentric rings + cross. Hybrid colour treatment: ghost rings are
+// mono pale purple, the active ring splits into four family-coloured
+// quadrants (purple TR+BL for Curiosity/Critical Thinking, teal TL+BR for
+// Collaboration/Communication). Active ring becomes the only multi-coloured
+// element on the canvas — strong placement signal AND foreshadows the four
+// strengths the quiz tests. Cross stays white throughout.
 // Sized 160 mobile / 200 desktop. Ring index follows local RESULT_RING:
 // 0 innermost (Essentials) → 3 outermost (Leading).
+//
+// Note: quadrant diagonal (which way the X points) is a guess — flip the
+// rotations if it doesn't match CircleSimple's convention elsewhere.
 
 function ResultCircle({
   size,
@@ -326,23 +332,59 @@ function ResultCircle({
     ringWidth * 2.5,  // ri=2 (Influencing)
     ringWidth * 3.5,  // ri=3 outermost (Leading)
   ];
-  const activeColor = COLORS.purple.hero;
   const ghostColor = COLORS.purple.notYet;
+  const purpleHero = COLORS.purple.hero;
+  const tealHero = COLORS.teal.hero;
   const crossWidth = Math.max(2, size / 80);
+
+  // Quadrants on the active ring. SVG circle stroke begins at angle 0
+  // (3 o'clock) and proceeds clockwise; with stroke-dasharray "C/4 3C/4"
+  // only one quarter is visible. Rotation places that quarter into the
+  // chosen quadrant. 0=BR, 90=BL, 180=TL, 270=TR.
+  const activeQuadrants = [
+    { rotation: 0,   color: tealHero   },  // BR — Communication
+    { rotation: 90,  color: purpleHero },  // BL — Critical Thinking
+    { rotation: 180, color: tealHero   },  // TL — Collaboration
+    { rotation: 270, color: purpleHero },  // TR — Curiosity
+  ];
 
   return (
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-      {ringRadii.map((r, i) => (
-        <circle
-          key={i}
-          cx={c}
-          cy={c}
-          r={r}
-          fill="none"
-          stroke={i === activeRing ? activeColor : ghostColor}
-          strokeWidth={ringWidth}
-        />
-      ))}
+      {ringRadii.map((r, i) => {
+        if (i === activeRing) {
+          const quarter = (2 * Math.PI * r) / 4;
+          const dash = `${quarter} ${quarter * 3}`;
+          return (
+            <g key={i}>
+              {activeQuadrants.map((q, qi) => (
+                <circle
+                  key={qi}
+                  cx={c}
+                  cy={c}
+                  r={r}
+                  fill="none"
+                  stroke={q.color}
+                  strokeWidth={ringWidth}
+                  strokeDasharray={dash}
+                  transform={`rotate(${q.rotation} ${c} ${c})`}
+                />
+              ))}
+            </g>
+          );
+        }
+        // Ghost ring — solid pale purple
+        return (
+          <circle
+            key={i}
+            cx={c}
+            cy={c}
+            r={r}
+            fill="none"
+            stroke={ghostColor}
+            strokeWidth={ringWidth}
+          />
+        );
+      })}
       <line
         x1={0}
         y1={c}
