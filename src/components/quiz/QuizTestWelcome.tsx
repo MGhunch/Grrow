@@ -411,7 +411,6 @@ function ResultCircle({
 //   - Question text as the headline (the question IS the title)
 //   - 3 answer rows (no tooltips — labels carry their own meaning)
 //   - Footer is just back/next (no eyebrow + progress bar — too much for 3 steps)
-//   - Button copy "Got it" not "Next" — peer-mentor warmth on the locate
 // Locate is purple-family always.
 
 interface QuestionStepProps<T extends string> {
@@ -547,7 +546,7 @@ function QuestionStep<T extends string>({
           onClick={handleNext}
           style={{ padding: '11px 36px' }}
         >
-          Got it
+          Next
         </ButtonPrimary>
       </div>
     </div>

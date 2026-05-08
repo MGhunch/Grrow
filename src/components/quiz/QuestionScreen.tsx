@@ -200,7 +200,7 @@ export function QuestionScreen({
                   transform: isSelected ? 'translateY(-2px)' : 'none',
                 }}
               >
-                {/* Label + tooltip (tooltip only when selected) */}
+                {/* Label + tooltip — tooltip always rendered to keep height constant */}
                 <div className="flex-1">
                   <span
                     className="text-bold-m block"
@@ -208,11 +208,15 @@ export function QuestionScreen({
                   >
                     {option.label}
                   </span>
-                  {isSelected && (
-                    <span className="text-std-s mt-0.5 block text-white/80">
-                      {option.tooltip}
-                    </span>
-                  )}
+                  <span
+                    className="text-std-s mt-0.5 block transition-opacity duration-150"
+                    style={{
+                      color: 'rgba(255, 255, 255, 0.8)',
+                      opacity: isSelected ? 1 : 0,
+                    }}
+                  >
+                    {option.tooltip}
+                  </span>
                 </div>
               </button>
             );
