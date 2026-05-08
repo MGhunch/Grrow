@@ -16,7 +16,7 @@ import { COLORS, familyAlpha } from '@/lib/colors';
 import CloseButton from '../shared/CloseButton';
 import { ButtonPrimary, ButtonSecondary } from '../shared/Button';
 import CircleSimple from '../circle/CircleSimple';
-import { CIRCLE_DISPLAY, CIRCLE_DESCRIPTION, CIRCLE_TO_RING } from './shared';
+import { CIRCLE_DISPLAY, CIRCLE_DESCRIPTION } from './shared';
 import type { Circle } from '@/lib/types';
 
 // ── Types ─────────────────────────────────────────────────────────────────
@@ -56,6 +56,22 @@ const CIRCLE_REFLECTION: Record<Circle, string> = {
   LEADING:     'Shining a light on where to next.',
 };
 
+// ── Result ring mapping ───────────────────────────────────────────────────
+// ResultCircle draws rings 0=innermost to 3=outermost. For the reveal
+// showcase we want Leading at the outer edge (expanded peak) and Essentials
+// at the centre (foundation core) — the natural "growing outward" metaphor.
+//
+// Note: this is the INVERSE of shared.ts CIRCLE_TO_RING (which serves
+// CircleSimple's center=Leading orientation). Kept local so we don't disturb
+// the rest of the codebase that depends on CircleSimple's existing mapping.
+
+const RESULT_RING: Record<Circle, number> = {
+  ESSENTIALS:  0,
+  EXPLORING:   1,
+  INFLUENCING: 2,
+  LEADING:     3,
+};
+
 // ── Locate mapping ────────────────────────────────────────────────────────
 // Years sets tier, people sets position within tier.
 // (veteran + just_me = senior IC = Influencing.)
@@ -85,9 +101,7 @@ export function QuizTestWelcome({ onClose, onStartQuiz }: QuizTestWelcomeProps) 
         onClose={handleClose}
         title="Hello"
         body={[
-          "Here's twelve questions",
-          "to see where you're at.",
-          'Plus two to get started.',
+          "Here's twelve questions to see where you're at. Plus two to get started.",
         ]}
         buttonLabel="Dig in"
         onButton={() => setStep('q1')}
@@ -231,7 +245,7 @@ interface ResultScreenProps {
 }
 
 function ResultScreen({ onClose, circle, onStart }: ResultScreenProps) {
-  const activeRing = CIRCLE_TO_RING[circle];
+  const activeRing = RESULT_RING[circle];
   const accent = COLORS.purple.hero;
   const muted = COLORS.ui.lightMuted;
 
@@ -263,7 +277,7 @@ function ResultScreen({ onClose, circle, onStart }: ResultScreenProps) {
         {/* Circle name */}
         <h2
           className="text-headline-l mb-2"
-          style={{ color: COLORS.ui.nearBlack }}
+          style={{ color: accent }}
         >
           {CIRCLE_DISPLAY[circle]}
         </h2>
@@ -294,8 +308,8 @@ function ResultScreen({ onClose, circle, onStart }: ResultScreenProps) {
 // Four concentric rings + cross. Active ring solid purple hero, others
 // ghosted to notYet pale. Cross is white — barely visible against pale rings,
 // pops on the active ring (showing the four strengths quadrant inside it).
-// Sized 160 mobile / 200 desktop. Ring index follows shared.ts CIRCLE_TO_RING:
-// 0 innermost (Leading) → 3 outermost (Essentials).
+// Sized 160 mobile / 200 desktop. Ring index follows local RESULT_RING:
+// 0 innermost (Essentials) → 3 outermost (Leading).
 
 function ResultCircle({
   size,
@@ -307,10 +321,10 @@ function ResultCircle({
   const c = size / 2;
   const ringWidth = size / 8;
   const ringRadii = [
-    ringWidth * 0.5,  // ri=0 innermost (Leading)
-    ringWidth * 1.5,  // ri=1
-    ringWidth * 2.5,  // ri=2
-    ringWidth * 3.5,  // ri=3 outermost (Essentials)
+    ringWidth * 0.5,  // ri=0 innermost (Essentials)
+    ringWidth * 1.5,  // ri=1 (Exploring)
+    ringWidth * 2.5,  // ri=2 (Influencing)
+    ringWidth * 3.5,  // ri=3 outermost (Leading)
   ];
   const activeColor = COLORS.purple.hero;
   const ghostColor = COLORS.purple.notYet;
