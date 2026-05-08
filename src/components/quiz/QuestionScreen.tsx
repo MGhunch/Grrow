@@ -182,7 +182,7 @@ export function QuestionScreen({
         </p>
 
         {/* Answer rows — with wobble animation */}
-        <div className={`flex flex-col gap-2.5 mb-8 ${showNudge ? 'animate-nudge' : ''}`}>
+        <div className={`flex flex-col gap-2.5 ${showNudge ? 'animate-nudge' : ''}`}>
           {OPTIONS.map((option) => {
             const isSelected = selectedAnswer === option.value;
             return (
@@ -200,7 +200,7 @@ export function QuestionScreen({
                   transform: isSelected ? 'translateY(-2px)' : 'none',
                 }}
               >
-                {/* Label + tooltip — tooltip always rendered to keep height constant */}
+                {/* Label + tooltip (tooltip only when selected) */}
                 <div className="flex-1">
                   <span
                     className="text-bold-m block"
@@ -208,20 +208,25 @@ export function QuestionScreen({
                   >
                     {option.label}
                   </span>
-                  <span
-                    className="text-std-s mt-0.5 block transition-opacity duration-150"
-                    style={{
-                      color: 'rgba(255, 255, 255, 0.8)',
-                      opacity: isSelected ? 1 : 0,
-                    }}
-                  >
-                    {option.tooltip}
-                  </span>
+                  {isSelected && (
+                    <span className="text-std-s mt-0.5 block text-white/80">
+                      {option.tooltip}
+                    </span>
+                  )}
                 </div>
               </button>
             );
           })}
         </div>
+
+        {/* Reserve tooltip height when nothing selected — keeps modal stable on first select */}
+        <div
+          aria-hidden
+          className="transition-[height] duration-150 ease-out"
+          style={{ height: selectedAnswer === null ? 22 : 0 }}
+        />
+
+        <div className="mb-8" />
       </div>
 
       {/* ── Footer ───────────────────────────────────────────────────── */}
