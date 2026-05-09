@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { ChevronDown, ChevronUp, Sparkles, Network, Waves, GitBranch, Check } from "lucide-react";
+import { scoreToState } from "@/lib/scoring";
 
 // ── Types ─────────────────────────────────────────────────────────────
 
@@ -52,12 +53,7 @@ function CircleDotIcon({ stage, size = 20 }: { stage: 1 | 2 | 3 | 4; size?: numb
 
 // ── Helpers ───────────────────────────────────────────────────────────
 
-function getScoreState(score: number): string {
-  if (score >= 76) return "Nailing it";
-  if (score >= 51) return "Growing";
-  if (score >= 26) return "Learning";
-  return "Not yet";
-}
+const getScoreState = scoreToState;
 
 // Progress fill — lighter shades visible against hero bg (desktop only)
 const FILL_COLORS = {
