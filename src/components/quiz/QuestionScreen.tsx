@@ -176,7 +176,7 @@ export function QuestionScreen({
       <div className="flex-1 flex flex-col min-h-0">
         {/* Question text — standard weight, family dark */}
         <p 
-          className="text-std-l leading-relaxed mb-6" 
+          className="text-std-l leading-relaxed mb-4" 
           style={{ color: accentDark }}
         >
           {questionText}
@@ -229,7 +229,7 @@ export function QuestionScreen({
         </div>
 
         {/* Progress bar */}
-        <div className="h-1.5 bg-gray rounded-sm overflow-hidden mb-6">
+        <div className="h-1.5 bg-gray rounded-sm overflow-hidden mb-4">
           <div
             className="h-full rounded-sm transition-[width] duration-300 ease-out min-w-2"
             style={{
