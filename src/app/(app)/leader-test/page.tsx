@@ -17,9 +17,9 @@ const SAMPLE_SKILLSETS = [
     family: "purple" as const,
     objective: "Do you take time to clarify the ask and summarise the job before starting?",
     questions: [
-      { id: "CT-CLA-01", title: "Clarify the ask", learnerAnswer: "Mostly" },
-      { id: "CT-CLA-02", title: "Spot the blockers", learnerAnswer: "Sometimes" },
-      { id: "CT-CLA-03", title: "Play it back", learnerAnswer: "Mostly" },
+      { id: "C1-CRI-CLARIFY-1", title: "Clarify the ask", learnerAnswer: "Mostly" },
+      { id: "C1-CRI-CLARIFY-2", title: "Spot the blockers", learnerAnswer: "Sometimes" },
+      { id: "C1-CRI-CLARIFY-3", title: "Play it back", learnerAnswer: "Mostly" },
     ],
   },
   { 
@@ -29,9 +29,9 @@ const SAMPLE_SKILLSETS = [
     family: "teal" as const,
     objective: "Do you consistently deliver and use feedback to be a safe pair of hands?",
     questions: [
-      { id: "CL-ENG-25", title: "Own your time", learnerAnswer: "Sometimes" },
-      { id: "CL-ENG-26", title: "Bounce ideas", learnerAnswer: "Mostly" },
-      { id: "CL-ENG-27", title: "Seek feedback", learnerAnswer: "Sometimes" },
+      { id: "C1-COL-ENGAGE-1", title: "Own your time", learnerAnswer: "Sometimes" },
+      { id: "C1-COL-ENGAGE-2", title: "Bounce ideas", learnerAnswer: "Mostly" },
+      { id: "C1-COL-ENGAGE-3", title: "Seek feedback", learnerAnswer: "Sometimes" },
     ],
   },
   { 
@@ -41,9 +41,9 @@ const SAMPLE_SKILLSETS = [
     family: "teal" as const,
     objective: "Do you respond promptly, share clear updates, and flag changes that impact others?",
     questions: [
-      { id: "CO-CON-37", title: "Close the loop", learnerAnswer: "Sometimes" },
-      { id: "CO-CON-38", title: "Keep it simple", learnerAnswer: "Mostly" },
-      { id: "CO-CON-39", title: "Raise good flags", learnerAnswer: "Sometimes" },
+      { id: "C1-COM-UPDATE-1", title: "Close the loop", learnerAnswer: "Sometimes" },
+      { id: "C1-COM-UPDATE-2", title: "Keep it simple", learnerAnswer: "Mostly" },
+      { id: "C1-COM-UPDATE-3", title: "Raise good flags", learnerAnswer: "Sometimes" },
     ],
   },
   { 
@@ -53,9 +53,9 @@ const SAMPLE_SKILLSETS = [
     family: "purple" as const,
     objective: "Do you stay curious about people and ideas beyond your immediate work?",
     questions: [
-      { id: "CR-QUE-13", title: "Tune into people", learnerAnswer: "Intuitively" },
-      { id: "CR-QUE-14", title: "Steal like a pirate", learnerAnswer: "Mostly" },
-      { id: "CR-QUE-15", title: "Ask why before how", learnerAnswer: "Intuitively" },
+      { id: "C1-CUR-QUESTION-1", title: "Tune into people", learnerAnswer: "Intuitively" },
+      { id: "C1-CUR-QUESTION-2", title: "Steal like a pirate", learnerAnswer: "Mostly" },
+      { id: "C1-CUR-QUESTION-3", title: "Ask why before how", learnerAnswer: "Intuitively" },
     ],
   },
 ];
