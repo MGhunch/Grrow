@@ -9,7 +9,7 @@ import { ButtonPrimary, ButtonSecondary } from "../../components/shared/Button";
 import CircleSimple from "../../components/circle/CircleSimple";
 import { QuizTestWelcome } from "../../components/quiz/QuizTestWelcome";
 import type { Circle, StrengthName } from "@/lib/types";
-import type { ColourFamily } from "@/lib/scoring";
+import { scoreToState, type ColourFamily } from "@/lib/scoring";
 
 // ── Test Page ─────────────────────────────────────────────────────────────
 
@@ -156,12 +156,7 @@ const STRENGTH_TO_SEGMENT: Record<StrengthName, number> = {
   Communication: 3,
 };
 
-function getScoreState(score: number): string {
-  if (score <= 25) return "Not yet";
-  if (score <= 50) return "Learning";
-  if (score <= 75) return "Growing";
-  return "Nailing it";
-}
+const getScoreState = scoreToState;
 
 // ── Mock Data ─────────────────────────────────────────────────────────────
 
