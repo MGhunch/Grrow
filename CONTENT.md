@@ -26,14 +26,25 @@ The question prompt is always: **"What's your take?"**
 
 ### Score → Response State
 
-| Score range | State | Description |
-|---|---|---|
-| 0–25 | Not yet | This is new territory. |
-| 26–50 | Learning | You can do it when prompted. |
-| 51–75 | Growing | You're building a habit. |
-| 76–100 | Nailing it | You do it without thinking. |
+Each answer carries a rank: Not really = 1, Sometimes = 2, Mostly = 3, Intuitively = 4. The three answers in a skillset are summed.
 
-Scores are averaged across the 3 questions in a skillset to produce the response state.
+| Sum of three | Response state | Description |
+|---|---|---|
+| 3–4 | Not yet | This is new territory. |
+| 5–7 | Learning | You can do it when prompted. |
+| 8–10 | Growing | You're building a habit. |
+| 11–12 | Nailing it | You do it without thinking. |
+
+**The rule of two:** to land in *Nailing it*, at least two of three answers must be Intuitively. Mirror at the bottom: to stay in *Not yet*, at least two must be Not really. One peak (or one stumble) doesn't move you across a band.
+
+The same logic holds when expressed as a 0-100 average (the form scores are stored in): boundaries at 12, 55, 89.
+
+| Average score | State |
+|---|---|
+| 0–11 | Not yet |
+| 12–54 | Learning |
+| 55–88 | Growing |
+| 89–100 | Nailing it |
 
 ---
 
