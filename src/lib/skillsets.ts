@@ -31,7 +31,7 @@ export const STRENGTHS: Strength[] = [
     skillsets: [
       { name: "Clarify",  objective: "Do you take time to clarify the ask and summarise the job before starting?" },
       { name: "Simplify", objective: "Do you focus on what matters most and learn from what's worked before?" },
-      { name: "Solve",    objective: "Do you diagnose root causes, identify blockers, and seek better solutions?" },
+      { name: "Solve",    objective: "Do you dig beyond the noise to solve the problems that cause it?" },
       { name: "Innovate", objective: "Do you spot industry innovations, evaluate new ideas, and drive their adoption?" },
     ],
   },
@@ -44,7 +44,7 @@ export const STRENGTHS: Strength[] = [
     skillsets: [
       { name: "Update",   objective: "Do you respond promptly, share clear updates, and flag changes that impact others?" },
       { name: "Navigate", objective: "Do you read the room, anticipate needs, and keep the right people informed?" },
-      { name: "Persuade", objective: "Do you frame your thinking and adapt your style so your ideas land with different people?" },
+      { name: "Persuade", objective: "Do you frame your thinking for different people to land your ideas?" },
       { name: "Guide",    objective: "Do you set clear goals, assess progress fairly, and empower your teams to thrive?" },
     ],
   },
@@ -56,7 +56,7 @@ export const STRENGTHS: Strength[] = [
     labelReversed: false,
     skillsets: [
       { name: "Engage",  objective: "Do you consistently deliver and learn from feedback to be seen as a safe pair of hands?" },
-      { name: "Connect", objective: "Do you anticipate others' needs, juggle competing views, and reduce friction?" },
+      { name: "Connect", objective: "Do you juggle competing views, anticipate needs and work to reduce friction?" },
       { name: "Unlock",  objective: "Do you remove barriers and create clarity so others can succeed?" },
       { name: "Inspire", objective: "Do you lead with energy, coach consistently, and inspire your teams to succeed?" },
     ],
