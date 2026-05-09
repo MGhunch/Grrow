@@ -3,7 +3,7 @@
 
 import { COLORS } from "@/lib/colors";
 import type { StrengthName, Circle, ScoreState } from '@/lib/types';
-import type { ColourFamily } from '@/lib/scoring';
+import { scoreToState, type ColourFamily } from '@/lib/scoring';
 
 // ── Modal Contract ────────────────────────────────────────────────────
 // All quiz modals use these dimensions for consistency
@@ -57,12 +57,20 @@ export const STRENGTH_TO_SEGMENT: Record<StrengthName, number> = {
 };
 
 // ── Score Helpers ─────────────────────────────────────────────────────
+// Wraps scoreToState (the canonical state mapper in lib/scoring.ts) and
+// pairs the state with a display fill percentage for progress bars.
+// Thresholds live in lib/scoring.ts — don't duplicate them here.
+
+const STATE_FILL: Record<ScoreState, number> = {
+  "Not yet": 25,
+  "Learning": 50,
+  "Growing": 75,
+  "Nailing it": 100,
+};
 
 export function getScoreState(score: number): { label: ScoreState; fill: number } {
-  if (score <= 25) return { label: "Not yet", fill: 25 };
-  if (score <= 50) return { label: "Learning", fill: 50 };
-  if (score <= 75) return { label: "Growing", fill: 75 };
-  return { label: "Nailing it", fill: 100 };
+  const label = scoreToState(score);
+  return { label, fill: STATE_FILL[label] };
 }
 
 // ── Unique Key Generator ──────────────────────────────────────────────
