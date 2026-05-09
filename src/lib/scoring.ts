@@ -27,11 +27,19 @@ export const SCORE_STATES: ScoreState[] = [
 ];
 
 // ── Score → State Mapping ─────────────────────────────────────────────────
+// Thresholds derived from rank-sum logic on three answers scored 1-4
+// (Not really=1, Sometimes=2, Mostly=3, Intuitively=4).
+// Sum 3-4 → Not yet · 5-7 → Learning · 8-10 → Growing · 11-12 → Nailing it.
+// Equivalent on the 0-100 average scale: ≤11 / 12-54 / 55-88 / 89+.
+// Boundaries sit in the gaps between achievable averages, so every result
+// lands cleanly in one band. To reach Nailing it, you need at least two
+// "Intuitively" answers — one peak isn't enough. Mirror at the bottom:
+// to stay in Not yet, you need at least two "Not really" answers.
 
 export function scoreToState(score: number): ScoreState {
-  if (score <= 25) return "Not yet";
-  if (score <= 50) return "Learning";
-  if (score <= 75) return "Growing";
+  if (score <= 11) return "Not yet";
+  if (score <= 54) return "Learning";
+  if (score <= 88) return "Growing";
   return "Nailing it";
 }
 

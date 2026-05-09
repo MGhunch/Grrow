@@ -40,9 +40,9 @@ export function findGapStrength(
   const circleBelow = getCircleBelow(currentCircle);
   if (!circleBelow) return null; // At Essentials, can't gap
 
-  // Find all strengths below 51%
+  // Find all strengths below 55% (i.e. in Not yet or Learning territory)
   const gaps = (Object.entries(scores) as [StrengthName, number][])
-    .filter(([, score]) => score < 51)
+    .filter(([, score]) => score < 55)
     .sort((a, b) => a[1] - b[1]); // Sort ascending (lowest first)
 
   if (gaps.length === 0) return null;
@@ -52,7 +52,7 @@ export function findGapStrength(
 }
 
 /**
- * Find the stretch strength — highest scoring ≥76%
+ * Find the stretch strength — highest scoring ≥89%
  * Returns null if at Leading (can't go up) or no stretches exist
  */
 export function findStretchStrength(
@@ -62,9 +62,9 @@ export function findStretchStrength(
   const circleAbove = getCircleAbove(currentCircle);
   if (!circleAbove) return null; // At Leading, can't stretch
 
-  // Find all strengths at 76% or above
+  // Find all strengths at 89% or above (Nailing it territory)
   const stretches = (Object.entries(scores) as [StrengthName, number][])
-    .filter(([, score]) => score >= 76)
+    .filter(([, score]) => score >= 89)
     .sort((a, b) => b[1] - a[1]); // Sort descending (highest first)
 
   if (stretches.length === 0) return null;
