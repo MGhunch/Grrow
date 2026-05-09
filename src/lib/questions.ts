@@ -11,7 +11,7 @@ import type { StrengthName, Circle } from './types';
 // Types
 // ----------------------------------------------------------------------------
 
-export type QuestionId = string; // e.g. 'CT-CLA-01'
+export type QuestionId = string; // e.g. 'C1-CRI-CLARIFY-1'
 
 export interface Question {
   id: QuestionId;
@@ -66,7 +66,7 @@ export const QUESTIONS: Question[] = [
 
   // ── Curiosity · Question ───────────────────────────────────────────────────
   {
-    id: 'CR-QUE-13',
+    id: 'C1-CUR-QUESTION-1',
     circle: 'ESSENTIALS',
     strength: 'Curiosity',
     strengthOrder: 1,
@@ -79,7 +79,7 @@ export const QUESTIONS: Question[] = [
     active: true,
   },
   {
-    id: 'CR-QUE-14',
+    id: 'C1-CUR-QUESTION-2',
     circle: 'ESSENTIALS',
     strength: 'Curiosity',
     strengthOrder: 1,
@@ -92,7 +92,7 @@ export const QUESTIONS: Question[] = [
     active: true,
   },
   {
-    id: 'CR-QUE-15',
+    id: 'C1-CUR-QUESTION-3',
     circle: 'ESSENTIALS',
     strength: 'Curiosity',
     strengthOrder: 1,
@@ -107,7 +107,7 @@ export const QUESTIONS: Question[] = [
 
   // ── Collaboration · Engage ─────────────────────────────────────────────────
   {
-    id: 'CL-ENG-25',
+    id: 'C1-COL-ENGAGE-1',
     circle: 'ESSENTIALS',
     strength: 'Collaboration',
     strengthOrder: 2,
@@ -120,20 +120,20 @@ export const QUESTIONS: Question[] = [
     active: true,
   },
   {
-    id: 'CL-ENG-26',
+    id: 'C1-COL-ENGAGE-2',
     circle: 'ESSENTIALS',
     strength: 'Collaboration',
     strengthOrder: 2,
     skillset: 'Engage',
     objective: 'Do you consistently deliver and learn from feedback to be seen as a safe pair of hands?',
-    title: 'Bounce ideas',
-    questionText: 'Do you share your ideas and bounce off others to improve the thinking?',
+    title: 'Sense check',
+    questionText: 'Do you sense check thinking with others to make the work better?',
     questionOrder: 2,
     version: 'v1.0',
     active: true,
   },
   {
-    id: 'CL-ENG-27',
+    id: 'C1-COL-ENGAGE-3',
     circle: 'ESSENTIALS',
     strength: 'Collaboration',
     strengthOrder: 2,
@@ -148,7 +148,7 @@ export const QUESTIONS: Question[] = [
 
   // ── Communication · Update ─────────────────────────────────────────────────
   {
-    id: 'CO-CON-37',
+    id: 'C1-COM-UPDATE-1',
     circle: 'ESSENTIALS',
     strength: 'Communication',
     strengthOrder: 3,
@@ -161,7 +161,7 @@ export const QUESTIONS: Question[] = [
     active: true,
   },
   {
-    id: 'CO-CON-38',
+    id: 'C1-COM-UPDATE-2',
     circle: 'ESSENTIALS',
     strength: 'Communication',
     strengthOrder: 3,
@@ -174,7 +174,7 @@ export const QUESTIONS: Question[] = [
     active: true,
   },
   {
-    id: 'CO-CON-39',
+    id: 'C1-COM-UPDATE-3',
     circle: 'ESSENTIALS',
     strength: 'Communication',
     strengthOrder: 3,
@@ -189,7 +189,7 @@ export const QUESTIONS: Question[] = [
 
   // ── Critical Thinking · Clarify ────────────────────────────────────────────
   {
-    id: 'CT-CLA-01',
+    id: 'C1-CRI-CLARIFY-1',
     circle: 'ESSENTIALS',
     strength: 'Critical Thinking',
     strengthOrder: 4,
@@ -202,7 +202,7 @@ export const QUESTIONS: Question[] = [
     active: true,
   },
   {
-    id: 'CT-CLA-02',
+    id: 'C1-CRI-CLARIFY-2',
     circle: 'ESSENTIALS',
     strength: 'Critical Thinking',
     strengthOrder: 4,
@@ -215,7 +215,7 @@ export const QUESTIONS: Question[] = [
     active: true,
   },
   {
-    id: 'CT-CLA-03',
+    id: 'C1-CRI-CLARIFY-3',
     circle: 'ESSENTIALS',
     strength: 'Critical Thinking',
     strengthOrder: 4,
@@ -234,7 +234,7 @@ export const QUESTIONS: Question[] = [
 
   // ── Curiosity · Challenge ──────────────────────────────────────────────────
   {
-    id: 'CR-IMP-16',
+    id: 'C2-CUR-CHALLENGE-1',
     circle: 'EXPLORING',
     strength: 'Curiosity',
     strengthOrder: 1,
@@ -247,7 +247,7 @@ export const QUESTIONS: Question[] = [
     active: true,
   },
   {
-    id: 'CR-IMP-17',
+    id: 'C2-CUR-CHALLENGE-2',
     circle: 'EXPLORING',
     strength: 'Curiosity',
     strengthOrder: 1,
@@ -260,7 +260,7 @@ export const QUESTIONS: Question[] = [
     active: true,
   },
   {
-    id: 'CR-IMP-18',
+    id: 'C2-CUR-CHALLENGE-3',
     circle: 'EXPLORING',
     strength: 'Curiosity',
     strengthOrder: 1,
@@ -275,7 +275,7 @@ export const QUESTIONS: Question[] = [
 
   // ── Collaboration · Connect ────────────────────────────────────────────────
   {
-    id: 'CL-OPO-28',
+    id: 'C2-COL-CONNECT-1',
     circle: 'EXPLORING',
     strength: 'Collaboration',
     strengthOrder: 2,
@@ -288,7 +288,7 @@ export const QUESTIONS: Question[] = [
     active: true,
   },
   {
-    id: 'CL-OPO-29',
+    id: 'C2-COL-CONNECT-2',
     circle: 'EXPLORING',
     strength: 'Collaboration',
     strengthOrder: 2,
@@ -301,7 +301,7 @@ export const QUESTIONS: Question[] = [
     active: true,
   },
   {
-    id: 'CL-OPO-30',
+    id: 'C2-COL-CONNECT-3',
     circle: 'EXPLORING',
     strength: 'Collaboration',
     strengthOrder: 2,
@@ -316,7 +316,7 @@ export const QUESTIONS: Question[] = [
 
   // ── Communication · Navigate ───────────────────────────────────────────────
   {
-    id: 'CO-MUM-40',
+    id: 'C2-COM-NAVIGATE-1',
     circle: 'EXPLORING',
     strength: 'Communication',
     strengthOrder: 3,
@@ -329,7 +329,7 @@ export const QUESTIONS: Question[] = [
     active: true,
   },
   {
-    id: 'CO-MUM-41',
+    id: 'C2-COM-NAVIGATE-2',
     circle: 'EXPLORING',
     strength: 'Communication',
     strengthOrder: 3,
@@ -342,7 +342,7 @@ export const QUESTIONS: Question[] = [
     active: true,
   },
   {
-    id: 'CO-MUM-42',
+    id: 'C2-COM-NAVIGATE-3',
     circle: 'EXPLORING',
     strength: 'Communication',
     strengthOrder: 3,
@@ -357,7 +357,7 @@ export const QUESTIONS: Question[] = [
 
   // ── Critical Thinking · Simplify ───────────────────────────────────────────
   {
-    id: 'CT-SIM-04',
+    id: 'C2-CRI-SIMPLIFY-1',
     circle: 'EXPLORING',
     strength: 'Critical Thinking',
     strengthOrder: 4,
@@ -370,7 +370,7 @@ export const QUESTIONS: Question[] = [
     active: true,
   },
   {
-    id: 'CT-SIM-05',
+    id: 'C2-CRI-SIMPLIFY-2',
     circle: 'EXPLORING',
     strength: 'Critical Thinking',
     strengthOrder: 4,
@@ -383,7 +383,7 @@ export const QUESTIONS: Question[] = [
     active: true,
   },
   {
-    id: 'CT-SIM-06',
+    id: 'C2-CRI-SIMPLIFY-3',
     circle: 'EXPLORING',
     strength: 'Critical Thinking',
     strengthOrder: 4,
@@ -402,7 +402,7 @@ export const QUESTIONS: Question[] = [
 
   // ── Curiosity · Create ─────────────────────────────────────────────────────
   {
-    id: 'CR-GVG-19',
+    id: 'C3-CUR-CREATE-1',
     circle: 'INFLUENCING',
     strength: 'Curiosity',
     strengthOrder: 1,
@@ -415,7 +415,7 @@ export const QUESTIONS: Question[] = [
     active: true,
   },
   {
-    id: 'CR-GVG-20',
+    id: 'C3-CUR-CREATE-2',
     circle: 'INFLUENCING',
     strength: 'Curiosity',
     strengthOrder: 1,
@@ -428,7 +428,7 @@ export const QUESTIONS: Question[] = [
     active: true,
   },
   {
-    id: 'CR-GVG-21',
+    id: 'C3-CUR-CREATE-3',
     circle: 'INFLUENCING',
     strength: 'Curiosity',
     strengthOrder: 1,
@@ -443,7 +443,7 @@ export const QUESTIONS: Question[] = [
 
   // ── Collaboration · Unlock ─────────────────────────────────────────────────
   {
-    id: 'CL-EMP-31',
+    id: 'C3-COL-UNLOCK-1',
     circle: 'INFLUENCING',
     strength: 'Collaboration',
     strengthOrder: 2,
@@ -456,7 +456,7 @@ export const QUESTIONS: Question[] = [
     active: true,
   },
   {
-    id: 'CL-EMP-32',
+    id: 'C3-COL-UNLOCK-2',
     circle: 'INFLUENCING',
     strength: 'Collaboration',
     strengthOrder: 2,
@@ -469,7 +469,7 @@ export const QUESTIONS: Question[] = [
     active: true,
   },
   {
-    id: 'CL-EMP-33',
+    id: 'C3-COL-UNLOCK-3',
     circle: 'INFLUENCING',
     strength: 'Collaboration',
     strengthOrder: 2,
@@ -484,7 +484,7 @@ export const QUESTIONS: Question[] = [
 
   // ── Communication · Persuade ───────────────────────────────────────────────
   {
-    id: 'CO-INF-43',
+    id: 'C3-COM-PERSUADE-1',
     circle: 'INFLUENCING',
     strength: 'Communication',
     strengthOrder: 3,
@@ -497,7 +497,7 @@ export const QUESTIONS: Question[] = [
     active: true,
   },
   {
-    id: 'CO-INF-44',
+    id: 'C3-COM-PERSUADE-2',
     circle: 'INFLUENCING',
     strength: 'Communication',
     strengthOrder: 3,
@@ -510,7 +510,7 @@ export const QUESTIONS: Question[] = [
     active: true,
   },
   {
-    id: 'CO-INF-45',
+    id: 'C3-COM-PERSUADE-3',
     circle: 'INFLUENCING',
     strength: 'Communication',
     strengthOrder: 3,
@@ -525,7 +525,7 @@ export const QUESTIONS: Question[] = [
 
   // ── Critical Thinking · Solve ──────────────────────────────────────────────
   {
-    id: 'CT-SOL-07',
+    id: 'C3-CRI-SOLVE-1',
     circle: 'INFLUENCING',
     strength: 'Critical Thinking',
     strengthOrder: 4,
@@ -538,7 +538,7 @@ export const QUESTIONS: Question[] = [
     active: true,
   },
   {
-    id: 'CT-SOL-08',
+    id: 'C3-CRI-SOLVE-2',
     circle: 'INFLUENCING',
     strength: 'Critical Thinking',
     strengthOrder: 4,
@@ -551,7 +551,7 @@ export const QUESTIONS: Question[] = [
     active: true,
   },
   {
-    id: 'CT-SOL-09',
+    id: 'C3-CRI-SOLVE-3',
     circle: 'INFLUENCING',
     strength: 'Critical Thinking',
     strengthOrder: 4,
@@ -570,7 +570,7 @@ export const QUESTIONS: Question[] = [
 
   // ── Curiosity · Cultivate ──────────────────────────────────────────────────
   {
-    id: 'CR-INN-22',
+    id: 'C4-CUR-CULTIVATE-1',
     circle: 'LEADING',
     strength: 'Curiosity',
     strengthOrder: 1,
@@ -583,7 +583,7 @@ export const QUESTIONS: Question[] = [
     active: true,
   },
   {
-    id: 'CR-INN-23',
+    id: 'C4-CUR-CULTIVATE-2',
     circle: 'LEADING',
     strength: 'Curiosity',
     strengthOrder: 1,
@@ -596,7 +596,7 @@ export const QUESTIONS: Question[] = [
     active: true,
   },
   {
-    id: 'CR-INN-24',
+    id: 'C4-CUR-CULTIVATE-3',
     circle: 'LEADING',
     strength: 'Curiosity',
     strengthOrder: 1,
@@ -611,7 +611,7 @@ export const QUESTIONS: Question[] = [
 
   // ── Collaboration · Inspire ────────────────────────────────────────────────
   {
-    id: 'CL-INS-34',
+    id: 'C4-COL-INSPIRE-1',
     circle: 'LEADING',
     strength: 'Collaboration',
     strengthOrder: 2,
@@ -624,7 +624,7 @@ export const QUESTIONS: Question[] = [
     active: true,
   },
   {
-    id: 'CL-INS-35',
+    id: 'C4-COL-INSPIRE-2',
     circle: 'LEADING',
     strength: 'Collaboration',
     strengthOrder: 2,
@@ -637,7 +637,7 @@ export const QUESTIONS: Question[] = [
     active: true,
   },
   {
-    id: 'CL-INS-36',
+    id: 'C4-COL-INSPIRE-3',
     circle: 'LEADING',
     strength: 'Collaboration',
     strengthOrder: 2,
@@ -652,7 +652,7 @@ export const QUESTIONS: Question[] = [
 
   // ── Communication · Guide ──────────────────────────────────────────────────
   {
-    id: 'CO-GUI-46',
+    id: 'C4-COM-GUIDE-1',
     circle: 'LEADING',
     strength: 'Communication',
     strengthOrder: 3,
@@ -665,7 +665,7 @@ export const QUESTIONS: Question[] = [
     active: true,
   },
   {
-    id: 'CO-GUI-47',
+    id: 'C4-COM-GUIDE-2',
     circle: 'LEADING',
     strength: 'Communication',
     strengthOrder: 3,
@@ -678,7 +678,7 @@ export const QUESTIONS: Question[] = [
     active: true,
   },
   {
-    id: 'CO-GUI-48',
+    id: 'C4-COM-GUIDE-3',
     circle: 'LEADING',
     strength: 'Communication',
     strengthOrder: 3,
@@ -693,7 +693,7 @@ export const QUESTIONS: Question[] = [
 
   // ── Critical Thinking · Innovate ───────────────────────────────────────────
   {
-    id: 'CT-INN-10',
+    id: 'C4-CRI-INNOVATE-1',
     circle: 'LEADING',
     strength: 'Critical Thinking',
     strengthOrder: 4,
@@ -706,7 +706,7 @@ export const QUESTIONS: Question[] = [
     active: true,
   },
   {
-    id: 'CT-INN-11',
+    id: 'C4-CRI-INNOVATE-2',
     circle: 'LEADING',
     strength: 'Critical Thinking',
     strengthOrder: 4,
@@ -719,7 +719,7 @@ export const QUESTIONS: Question[] = [
     active: true,
   },
   {
-    id: 'CT-INN-12',
+    id: 'C4-CRI-INNOVATE-3',
     circle: 'LEADING',
     strength: 'Critical Thinking',
     strengthOrder: 4,
