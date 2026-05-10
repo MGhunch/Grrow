@@ -89,10 +89,10 @@ export const CIRCLE_TAGLINE: Record<Circle, string> = {
   LEADING:     "Set the standard. Raise the bar.",
 };
 
-// ── Ring Stages (dashboard copy) ─────────────────────────────────────
+// ── Circle Stages (dashboard copy) ────────────────────────────────────
 // Personalised labels for dashboard: "You're starting out" for Essentials
 
-export const RING_STAGES = [
+export const CIRCLE_STAGES = [
   { label: "You're starting out", tagline: "Start strong. Build trust" },
   { label: "You're Exploring",    tagline: "Own it and improve it" },
   { label: "You're Influencing",  tagline: "Shape it and ship it" },
