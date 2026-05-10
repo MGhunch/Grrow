@@ -206,7 +206,7 @@ The Organisation entity is architected in from day one.
 | `components/ScoreComparison.tsx` | Learner vs leader side-by-side bars |
 | `components/KfgPicker.tsx` | Keep/Focus/Grow assignment UI |
 | `components/ReportLayout.tsx` | Print-optimised wrapper |
-| `contexts/ThemeContext.tsx` | Dark mode provider — `useTheme()` |
+| `lib/ThemeContext.tsx` | Dark mode provider — `useTheme()` |
 | `middleware.ts` | Supabase session refresh on every request |
 
 ---
