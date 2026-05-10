@@ -15,9 +15,9 @@ import {
   buildScoreMap,
   buildKfgMap,
   scoreToState,
-  RING_STAGES,
+  CIRCLE_STAGES,
 } from "./shared";
-import type { CircleName } from "./shared";
+import type { Circle } from "./shared";
 import {
   SnapshotData,
   ReportSkillset,
@@ -34,7 +34,7 @@ interface KfgCardProps {
   type: "keep" | "focus" | "grow";
   skillset?: ReportSkillset;
   growTarget?: SnapshotData["growTarget"];
-  circle: CircleName;
+  circle: Circle;
 }
 
 function KfgCard({ type, skillset, growTarget, circle }: KfgCardProps) {
@@ -173,7 +173,7 @@ interface KfgSectionProps {
   keepSkillset?: ReportSkillset;
   focusSkillset?: ReportSkillset;
   growTarget?: SnapshotData["growTarget"];
-  circle: CircleName;
+  circle: Circle;
 }
 
 function KfgSection({ keepSkillset, focusSkillset, growTarget, circle }: KfgSectionProps) {
@@ -429,7 +429,7 @@ export default function SnapshotPage1({ data }: { data: SnapshotData }) {
   const focusSkillset = data.skillsets.find((s) => s.kfg === "focus");
 
   const idx = getCircleIndex(data.circle);
-  const stage = RING_STAGES[idx];
+  const stage = CIRCLE_STAGES[idx];
   const tagline = stage?.tagline || "";
   const description = CIRCLE_DESCRIPTIONS[data.circle];
 

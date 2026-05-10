@@ -2,7 +2,7 @@
 // Report Types — extends @/lib/types
 // ═══════════════════════════════════════════════════════════════════════════
 
-import type { StrengthFamily, CircleName, KfgCategory } from "@/lib/types";
+import type { StrengthFamily, Circle, KfgCategory } from "@/lib/types";
 
 export type VarianceLevel = "mixed" | "split" | null;
 
@@ -28,14 +28,14 @@ export interface ReportSkillset {
 export interface GrowTarget {
   name: string;
   strength: string;
-  circle: CircleName;
+  circle: Circle;
   objective: string;
 }
 
 export interface SnapshotData {
   learner: string;
   leader: string;
-  circle: CircleName;
+  circle: Circle;
   date: string;
   skillsets: ReportSkillset[];
   growTarget: GrowTarget;
@@ -45,7 +45,7 @@ export interface SnapshotData {
 // Circle Descriptions
 // ═══════════════════════════════════════════════════════════════════════════
 
-export const CIRCLE_DESCRIPTIONS: Record<CircleName, string> = {
+export const CIRCLE_DESCRIPTIONS: Record<Circle, string> = {
   ESSENTIALS: "You're working to build trust by showing up reliably and asking good questions up front.",
   EXPLORING: "Now you need to own the work and actively make it better. Your goal? A safe pair of hands.",
   INFLUENCING: "Delivery is second nature. Now you're bringing others with you and shaping things together.",
