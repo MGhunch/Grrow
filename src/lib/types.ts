@@ -7,7 +7,6 @@ import type { LucideIcon } from "lucide-react";
 // ── Base Types ────────────────────────────────────────────────────────────
 
 export type Circle = "ESSENTIALS" | "EXPLORING" | "INFLUENCING" | "LEADING";
-export type CircleName = Circle;
 export type StrengthName = "Curiosity" | "Collaboration" | "Communication" | "Critical Thinking";
 export type StrengthFamily = "purple" | "teal";
 export type KfgCategory = "keep" | "focus" | "grow";
@@ -19,6 +18,8 @@ export type ScoreMap = Record<string, ScoreState>;
 export type KfgMap = Record<string, KfgCategory>;
 
 // ── Strength & Ring Definitions ───────────────────────────────────────────
+// Ring = SVG geometry (the donut shape between innerR/outerR that draws
+// each circle). Distinct from Circle, which is the product concept.
 
 export interface SkillsetDef {
   name: string;
@@ -39,9 +40,6 @@ export interface Ring {
   innerR: number;
   outerR: number;
 }
-
-// Legacy alias
-export type CircleLayer = Ring;
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Report Types
@@ -70,13 +68,13 @@ export interface ReportSkillset {
 export interface GrowTarget {
   name: string;
   strength: string;
-  circle: CircleName;
+  circle: Circle;
   objective: string;
 }
 
 export interface SnapshotData {
   learner: string;
-  circle: CircleName;
+  circle: Circle;
   date: string;
   skillsets: ReportSkillset[];
   growTarget: GrowTarget;
@@ -86,7 +84,7 @@ export interface SnapshotData {
 // Circle Descriptions
 // ═══════════════════════════════════════════════════════════════════════════
 
-export const CIRCLE_DESCRIPTIONS: Record<CircleName, string> = {
+export const CIRCLE_DESCRIPTIONS: Record<Circle, string> = {
   ESSENTIALS: "Right now, you're working to build trust by showing up reliably and asking good questions up front.",
   EXPLORING: "Right now, you're owning the work and actively making it better. Your goal? A safe pair of hands.",
   INFLUENCING: "Right now, delivery is second nature. You're bringing others with you and shaping things together.",
