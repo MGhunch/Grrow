@@ -5,8 +5,8 @@ import { COLORS, whiteAlpha } from "@/lib/colors";
 import { TEXT } from "@/lib/typography";
 import { scoreToState } from "@/lib/scoring";
 import { segKey } from "@/lib/skillsets";
-import { RING_STAGES, STRENGTHS } from "@/lib/skillsets";
-import type { CircleName, ScoreMap, KfgMap, ScoreState } from "@/lib/types";
+import { CIRCLE_STAGES, STRENGTHS } from "@/lib/skillsets";
+import type { Circle, ScoreMap, KfgMap, ScoreState } from "@/lib/types";
 import type { ReportSkillset } from "./types";
 import { avgScore } from "./types";
 
@@ -80,8 +80,8 @@ export function getStrengthIndex(strengthName: string): number {
   return STRENGTHS.findIndex((s) => s.name === strengthName);
 }
 
-export function getCircleIndex(circle: CircleName): number {
-  const map: Record<CircleName, number> = {
+export function getCircleIndex(circle: Circle): number {
+  const map: Record<Circle, number> = {
     ESSENTIALS: 0,
     EXPLORING: 1,
     INFLUENCING: 2,
@@ -90,7 +90,7 @@ export function getCircleIndex(circle: CircleName): number {
   return map[circle];
 }
 
-export function buildScoreMap(skillsets: ReportSkillset[], circle: CircleName): ScoreMap {
+export function buildScoreMap(skillsets: ReportSkillset[], circle: Circle): ScoreMap {
   const scores: ScoreMap = {};
   const ri = getCircleIndex(circle);
 
@@ -105,7 +105,7 @@ export function buildScoreMap(skillsets: ReportSkillset[], circle: CircleName): 
   return scores;
 }
 
-export function buildKfgMap(skillsets: ReportSkillset[], circle: CircleName): KfgMap {
+export function buildKfgMap(skillsets: ReportSkillset[], circle: Circle): KfgMap {
   const kfg: KfgMap = {};
   const ri = getCircleIndex(circle);
 
@@ -180,9 +180,9 @@ export function LogoWhite({ height = 20 }: { height?: number }) {
 // Headers
 // ═══════════════════════════════════════════════════════════════════════════
 
-export function Header({ learner, circle, date }: { learner: string; circle: CircleName; date: string }) {
+export function Header({ learner, circle, date }: { learner: string; circle: Circle; date: string }) {
   const idx = getCircleIndex(circle);
-  const displayName = RING_STAGES[idx]?.label.replace("You're ", "").replace("starting out", "Essentials") || circle;
+  const displayName = CIRCLE_STAGES[idx]?.label.replace("You're ", "").replace("starting out", "Essentials") || circle;
 
   return (
     <div
@@ -217,9 +217,9 @@ export function Header({ learner, circle, date }: { learner: string; circle: Cir
   );
 }
 
-export function HeaderCompact({ learner, circle, date }: { learner: string; circle: CircleName; date: string }) {
+export function HeaderCompact({ learner, circle, date }: { learner: string; circle: Circle; date: string }) {
   const idx = getCircleIndex(circle);
-  const displayName = RING_STAGES[idx]?.label.replace("You're ", "").replace("starting out", "Essentials") || circle;
+  const displayName = CIRCLE_STAGES[idx]?.label.replace("You're ", "").replace("starting out", "Essentials") || circle;
 
   return (
     <div
@@ -252,5 +252,5 @@ export function HeaderCompact({ learner, circle, date }: { learner: string; circ
 export { COLORS } from "@/lib/colors";
 export { TEXT } from "@/lib/typography";
 export { scoreToState } from "@/lib/scoring";
-export { RING_STAGES } from "@/lib/skillsets";
-export type { CircleName, ScoreState } from "@/lib/types";
+export { CIRCLE_STAGES } from "@/lib/skillsets";
+export type { Circle, ScoreState } from "@/lib/types";
